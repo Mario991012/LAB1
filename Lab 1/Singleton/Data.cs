@@ -24,7 +24,8 @@ namespace Lab_1.Singleton
         }
 
 
-        public Dictionary<char, int> CodigosPrefijo = new Dictionary<char, int>();
+        public Dictionary<char, int> Frecuencias = new Dictionary<char, int>();
+        public List<Estructuras.Nodo> ListaNodos = new List<Estructuras.Nodo>();
 
         public int Lectura(string path)
         {
@@ -37,17 +38,26 @@ namespace Lab_1.Singleton
                     char[] caracteres = item.ToCharArray();
                     for (int i = 0; i < caracteres.Length; i++)
                     {
-                        if (CodigosPrefijo.ContainsKey(caracteres[i]) == false)
+                        if (Frecuencias.ContainsKey(caracteres[i]) == false)
                         {
-                            CodigosPrefijo.Add(caracteres[i], 1);
+                            Frecuencias.Add(caracteres[i], 1);
                         }
                         else
                         {
-                            CodigosPrefijo[caracteres[i]] = CodigosPrefijo[caracteres[i]] + 1;
+                            Frecuencias[caracteres[i]] = Frecuencias[caracteres[i]] + 1;
                         }
                     }
-                    
                 }
+
+                foreach(var nodos in Frecuencias)
+                {
+                    Estructuras.Nodo nodo = new Estructuras.Nodo();
+                    nodo.Frecuencia = nodos.Value;
+                    nodo.Valor = nodos.Key;
+                    ListaNodos.Add(nodo);
+                    ListaNodos.Sort((x, y) => x.CompareTo(y));
+                }
+                
                 return 1;
             }
             catch

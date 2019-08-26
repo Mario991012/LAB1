@@ -81,3 +81,5 @@ C:\Users\PC\Desktop\Cursos\Estructura de Datos II\Lab 1\Lab 1\obj\Debug\Lab 1.cs
 C:\Users\PC\Desktop\Cursos\Estructura de Datos II\Lab 1\Lab 1\obj\Debug\Lab 1.csproj.CopyComplete
 C:\Users\PC\Desktop\Cursos\Estructura de Datos II\Lab 1\Lab 1\obj\Debug\Lab 1.dll
 C:\Users\PC\Desktop\Cursos\Estructura de Datos II\Lab 1\Lab 1\obj\Debug\Lab 1.pdb
+C:\Users\PC\Desktop\Cursos\Estructura de Datos II\Lab 1\Lab 1\bin\Estructuras.dll
+C:\Users\PC\Desktop\Cursos\Estructura de Datos II\Lab 1\Lab 1\bin\Estructuras.pdb
