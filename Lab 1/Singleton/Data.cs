@@ -23,12 +23,13 @@ namespace Lab_1.Singleton
             }
         }
 
+        public Dictionary<string, Dictionary<char, string>> CodigosPrefijo = new Dictionary<string, Dictionary<char, string>>(); 
         public Estructuras.ArbolS Arbol = new Estructuras.ArbolS();
-        public List<Estructuras.ArbolS> ListaArboles = new List<Estructuras.ArbolS>();
         public Dictionary<char, int> Frecuencias = new Dictionary<char, int>();
         public List<Estructuras.Nodo> ListaNodos = new List<Estructuras.Nodo>();
+        public Dictionary<char, string> AuxCodigosPrefijo = new Dictionary<char, string>();
 
-        public int Lectura(string path)
+        public int Lectura(string path, string nombreArchivo)
         {
             try
             {
@@ -58,7 +59,7 @@ namespace Lab_1.Singleton
                     ListaNodos.Add(nodo);
                     ListaNodos.Sort((x, y) => x.CompareTo(y));
                 }
-                CrearArbol(ListaNodos);
+                CrearArbol(ListaNodos, nombreArchivo);
                 return 1;
             }
             catch
@@ -67,11 +68,13 @@ namespace Lab_1.Singleton
             }
         }
 
-        public void CrearArbol(List<Estructuras.Nodo> ListNodos)
+        public void CrearArbol(List<Estructuras.Nodo> ListNodos, string nombreArchivo)
         {
             while (ListNodos.Count >= 2)
             {
                 Estructuras.Nodo padre = new Estructuras.Nodo();
+                ListaNodos[0].recorridoIzq = true;
+                ListaNodos[1].recorridoDer = true;
                 padre.izq = ListNodos[0];
                 padre.der = ListNodos[1];
                 padre.Frecuencia = padre.izq.Frecuencia + padre.der.Frecuencia;
@@ -86,20 +89,39 @@ namespace Lab_1.Singleton
             Estructuras.ArbolS tree = new Estructuras.ArbolS();
             tree.raiz = ListNodos[0];
             ListNodos.Clear();
-            ListaArboles.Add(tree);
+            //Crear codigos prefijo y agregarlos a un diccionario de codigos prefijo de un archivo
+            CodigoPrefijo(tree.raiz, nombreArchivo);
+            CodigosPrefijo.Add(nombreArchivo, AuxCodigosPrefijo);
+            codigo = "";
         }
-        
-        //public Dictionary<string, string> PalabrasReservadasPredeterminadas = new Dictionary<string, string>();
 
-        //public string nombreTabla { get; set; }
-        //public List<string> NombresTabla = new List<string>();
+        static string codigo = "";
+        public void CodigoPrefijo(Estructuras.Nodo nodo, string nombreArchivo)
+        {
+            if (nodo != null)
+            {
+                CodigoPrefijo(nodo.izq, nombreArchivo);
+                if(nodo.Valor != ' ')
+                {
+                    Codigo(nodo);
+                    AuxCodigosPrefijo.Add(nodo.Valor, codigo);
+                    codigo = "";
+                }
+                CodigoPrefijo(nodo.der, nombreArchivo);
+            }
+        }
 
-        //public Estructuras_de_Datos.Registro reg = new Estructuras_de_Datos.Registro();
-
-        //public List<Estructuras_de_Datos.NodoB<Estructuras_de_Datos.Registro>> listaNodos = new List<Estructuras_de_Datos.NodoB<Estructuras_de_Datos.Registro>>();
-
-        //public Dictionary<string, Estructuras_de_Datos.ArbolB<Estructuras_de_Datos.Registro>> Arboles = new Dictionary<string, Estructuras_de_Datos.ArbolB<Estructuras_de_Datos.Registro>>();
-        
-
+        public void Codigo(Estructuras.Nodo nodo)
+        {
+            if(nodo.recorridoIzq == true)
+            {
+                codigo = "0" + codigo;
+                Codigo(nodo.padre);
+            }else if(nodo.recorridoDer == true)
+            {
+                codigo = "1" + codigo;
+                Codigo(nodo.padre);
+            }
+        }
     }
 }

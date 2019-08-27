@@ -20,6 +20,9 @@ namespace Lab_1.Controllers
         [HttpPost]
         public ActionResult Carga(HttpPostedFileBase file)
         {
+            string nombreArchivo = file.FileName;
+            string[] nombre = nombreArchivo.Split('.');
+            nombreArchivo = nombre[0];
             try
             {
                 if (file != null && file.ContentLength > 0)
@@ -28,7 +31,7 @@ namespace Lab_1.Controllers
                     SeCargoDiccionario = true;
                     model = Server.MapPath("~/Archivo.txt");
                     file.SaveAs(model);
-                    if (Data.Instancia.Lectura(model) == 1)
+                    if (Data.Instancia.Lectura(model, nombreArchivo) == 1)
                     {
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
