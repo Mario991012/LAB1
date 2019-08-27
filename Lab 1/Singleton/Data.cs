@@ -23,7 +23,8 @@ namespace Lab_1.Singleton
             }
         }
 
-
+        public Estructuras.ArbolS Arbol = new Estructuras.ArbolS();
+        public List<Estructuras.ArbolS> ListaArboles = new List<Estructuras.ArbolS>();
         public Dictionary<char, int> Frecuencias = new Dictionary<char, int>();
         public List<Estructuras.Nodo> ListaNodos = new List<Estructuras.Nodo>();
 
@@ -57,7 +58,7 @@ namespace Lab_1.Singleton
                     ListaNodos.Add(nodo);
                     ListaNodos.Sort((x, y) => x.CompareTo(y));
                 }
-                
+                CrearArbol(ListaNodos);
                 return 1;
             }
             catch
@@ -66,6 +67,27 @@ namespace Lab_1.Singleton
             }
         }
 
+        public void CrearArbol(List<Estructuras.Nodo> ListNodos)
+        {
+            while (ListNodos.Count >= 2)
+            {
+                Estructuras.Nodo padre = new Estructuras.Nodo();
+                padre.izq = ListNodos[0];
+                padre.der = ListNodos[1];
+                padre.Frecuencia = padre.izq.Frecuencia + padre.der.Frecuencia;
+                ListNodos[0].padre = padre;
+                ListNodos[1].padre = padre;
+                ListNodos.Add(padre);
+                ListNodos.Remove(ListNodos[0]);
+                ListNodos.Remove(ListNodos[0]);
+                ListaNodos.Sort((x, y) => x.CompareTo(y));
+
+            }
+            Estructuras.ArbolS tree = new Estructuras.ArbolS();
+            tree.raiz = ListNodos[0];
+            ListNodos.Clear();
+            ListaArboles.Add(tree);
+        }
         
         //public Dictionary<string, string> PalabrasReservadasPredeterminadas = new Dictionary<string, string>();
 

@@ -12,12 +12,15 @@ namespace Estructuras
         public char Valor { get; set; }
         public Nodo izq { get; set; }
         public Nodo der { get; set; }
+        public Nodo padre { get; set; }
 
         public Nodo()
         {
             Frecuencia = 0;
             izq = null;
             der = null;
+            padre = null;
+
             Valor = ' ';
         }
 
