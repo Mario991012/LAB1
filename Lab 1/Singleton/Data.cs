@@ -93,6 +93,8 @@ namespace Lab_1.Singleton
             CodigoPrefijo(tree.raiz, nombreArchivo);
             CodigosPrefijo.Add(nombreArchivo, AuxCodigosPrefijo);
             codigo = "";
+            //Para crear archivo que contenga el codigo binario
+            EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo);
         }
 
         static string codigo = "";
@@ -122,6 +124,19 @@ namespace Lab_1.Singleton
                 codigo = "1" + codigo;
                 Codigo(nodo.padre);
             }
+        }
+
+        public void EscrituraHuffman(string FileName, Dictionary<char, string> dictionary)
+        {
+            string DireccionArchivo = "C:\\Users\\Marcos Andrés CM\\Desktop\\Cuarto ciclo 2019\\EDII\\PRUEBAS PARA LAB";
+
+            using (FileStream flujoArchivo = new FileStream(DireccionArchivo, FileAccess.Write, FileShare.None)) ;
+            /*StreamWriter archivo = new StreamWriter("C:\\Users\\Marcos Andrés CM\\Desktop\\Cuarto ciclo 2019\\EDII\\PRUEBAS PARA LAB");
+            foreach (var item in dictionary.Values)
+            {
+                archivo.WriteLine(item);
+            }
+            archivo.Close();*/
         }
     }
 }
