@@ -59,7 +59,7 @@ namespace Lab_1.Singleton
                     ListaNodos.Add(nodo);
                     ListaNodos.Sort((x, y) => x.CompareTo(y));
                 }
-                CrearArbol(ListaNodos, nombreArchivo);
+                CrearArbol(ListaNodos, nombreArchivo, lineas);
                 return 1;
             }
             catch
@@ -68,7 +68,7 @@ namespace Lab_1.Singleton
             }
         }
 
-        public void CrearArbol(List<Estructuras.Nodo> ListNodos, string nombreArchivo)
+        public void CrearArbol(List<Estructuras.Nodo> ListNodos, string nombreArchivo, string[] lineas)
         {
             while (ListNodos.Count >= 2)
             {
@@ -94,7 +94,7 @@ namespace Lab_1.Singleton
             CodigosPrefijo.Add(nombreArchivo, AuxCodigosPrefijo);
             codigo = "";
             //Para crear archivo que contenga el codigo binario
-            EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo);
+            EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo, lineas);
         }
 
         static string codigo = "";
@@ -126,11 +126,31 @@ namespace Lab_1.Singleton
             }
         }
 
-        public void EscrituraHuffman(string FileName, Dictionary<char, string> dictionary)
+        public void EscrituraHuffman(string FileName, Dictionary<char, string> dictionary, string[] lineas)
         {
-            string DireccionArchivo = "C:\\Users\\Marcos Andrés CM\\Desktop\\Cuarto ciclo 2019\\EDII\\PRUEBAS PARA LAB";
+            string Text = "";
+            foreach (var item in lineas)
+            {
+                char[] caracteres = item.ToCharArray();
 
-            using (FileStream flujoArchivo = new FileStream(DireccionArchivo, FileAccess.Write, FileShare.None)) ;
+                for (int i = 0; i < caracteres.Length; i++)
+                {
+                    foreach (var item2 in dictionary.Keys)
+                    {
+                        if (item2 == caracteres[i])
+                        {
+                            Text += dictionary[item2];
+                            break;
+                        }
+
+                    }
+                }
+                
+            }
+            System.IO.File.WriteAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", Text);
+            //string DireccionArchivo = "C:\\Users\\Marcos Andrés CM\\Desktop\\Cuarto ciclo 2019\\EDII\\PRUEBAS PARA LAB";
+
+            //using (FileStream flujoArchivo = new FileStream(DireccionArchivo, FileAccess.Write, FileShare.None)) ;
             /*StreamWriter archivo = new StreamWriter("C:\\Users\\Marcos Andrés CM\\Desktop\\Cuarto ciclo 2019\\EDII\\PRUEBAS PARA LAB");
             foreach (var item in dictionary.Values)
             {
