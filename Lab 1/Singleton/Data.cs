@@ -128,7 +128,7 @@ namespace Lab_1.Singleton
 
         public void EscrituraHuffman(string FileName, Dictionary<char, string> dictionary, string[] lineas)
         {
-            string Text = "";
+            var Text = "";
             foreach (var item in lineas)
             {
                 char[] caracteres = item.ToCharArray();
@@ -144,9 +144,9 @@ namespace Lab_1.Singleton
                         }
 
                     }
-                }
-                
+                }  
             }
+            ConvertirADecimal(Text);
             System.IO.File.WriteAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", Text);
             //string DireccionArchivo = "C:\\Users\\Marcos Andrés CM\\Desktop\\Cuarto ciclo 2019\\EDII\\PRUEBAS PARA LAB";
 
@@ -157,6 +157,19 @@ namespace Lab_1.Singleton
                 archivo.WriteLine(item);
             }
             archivo.Close();*/
+        }
+        public void ConvertirADecimal(string Text)
+        {
+            var respuesta = "";
+            var enlistado = 0;
+            List<int> decimales = new List<int>(); //Lista que almacenara los 8 bits
+            for (int i = 0; i < Text.Length; i+= 8)
+            {
+                respuesta = Text.Substring(i,8);
+                enlistado= Convert.ToInt32(respuesta, 2);
+                decimales.Add(enlistado);
+            }
+
         }
     }
 }
