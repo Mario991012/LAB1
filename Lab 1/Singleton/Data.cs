@@ -146,7 +146,7 @@ namespace Lab_1.Singleton
                     }
                 }  
             }
-            ConvertirADecimal(Text);
+            ConvertirADecimalYEscrituraTXT(Text, dictionary);
             System.IO.File.WriteAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", Text);
             //string DireccionArchivo = "C:\\Users\\Marcos Andrés CM\\Desktop\\Cuarto ciclo 2019\\EDII\\PRUEBAS PARA LAB";
 
@@ -158,11 +158,11 @@ namespace Lab_1.Singleton
             }
             archivo.Close();*/
         }
-        public void ConvertirADecimal(string Text)
+        public void ConvertirADecimalYEscrituraTXT(string Text, Dictionary<char, string> dictionary)
         {
             var respuesta = "";
             var enlistado = 0;
-            var ascii = "";
+            var ascii = string.Empty;
             List<string> decimales = new List<string>(); //Lista que almacenara los 8 bits
             for (int i = 0; i < Text.Length; i += 8)
             {
@@ -170,17 +170,50 @@ namespace Lab_1.Singleton
                 enlistado = Convert.ToInt32(respuesta, 2);
                 decimales.Add(enlistado.ToString());
             }
+            //NO BORRAR ESTO. ESTO ES UNA DE LAS DOS FORMAS PARA OBTENER EN ASCII
             
-            //System.IO.File.WriteAllLines(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", decimales);
-
-            foreach (var item in decimales)
+            /*for (int i = 0; i < decimales.Count; i++)
             {
-                for (int i = 0; i < item.Length; i+=3)
-                {
-                    ascii += (char)Convert.ToByte(item.Substring(i,3));
-                }
+                char asciiCode = Convert.ToChar(decimales[i]);
+                ascii += asciiCode;
+            }*/
+
+            List <string> keys = new List<string>();
+            List<string> values = new List<string>();
+
+            foreach (var item in dictionary.Keys)
+            {
+                keys.Add(item.ToString());
             }
-            //System.Text.Encoding.ASCII.GetString();
+            foreach (var item2 in dictionary.Values)
+            {
+                values.Add(item2);
+            }
+            var answer = "";
+            for (int i = 0; i < keys.Count; i++)
+            {
+                answer = keys[i] + "|" + values[i] + ",";
+                System.IO.File.AppendAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", answer);
+
+            }
+            for (int i = 0; i < decimales.Count; i++)
+            {
+                ascii += (char)Convert.ToByte(decimales[i].Substring(0, decimales[i].Length));
+
+            }
+            
+            using (StreamWriter tr2 = File.AppendText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt"))
+            {
+                tr2.WriteLine(ascii);
+            }
+            //var lectura = "";
+            //StreamReader tr = new StreamReader(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt");
+            //while ((lectura = tr.ReadLine()) == null)
+            //{
+            //    //System.IO.File.WriteAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", ascii);
+            //}
+            //System.IO.File.AppendAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", ascii);
+
         }
     }
 }
