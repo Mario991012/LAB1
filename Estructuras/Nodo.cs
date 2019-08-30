@@ -24,7 +24,7 @@ namespace Estructuras
             padre = null;
             recorridoIzq = false;
             recorridoDer = false;
-            Valor = ' ';
+            Valor = '\0';
         }
 
         public int CompareTo(object obj)

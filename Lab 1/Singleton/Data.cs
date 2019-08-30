@@ -28,8 +28,8 @@ namespace Lab_1.Singleton
         public Dictionary<char, int> Frecuencias = new Dictionary<char, int>();
         public List<Estructuras.Nodo> ListaNodos = new List<Estructuras.Nodo>();
         public Dictionary<char, string> AuxCodigosPrefijo = new Dictionary<char, string>();
-
-        public int Lectura(string path, string nombreArchivo)
+        public List<string> NombreArchivos = new List<string>();
+        public int Lectura(string path, string nombreArchivo, string pathHuffman)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace Lab_1.Singleton
                     ListaNodos.Add(nodo);
                     ListaNodos.Sort((x, y) => x.CompareTo(y));
                 }
-                CrearArbol(ListaNodos, nombreArchivo, lineas);
+                CrearArbol(ListaNodos, nombreArchivo, lineas, pathHuffman);
                 return 1;
             }
             catch
@@ -68,7 +68,7 @@ namespace Lab_1.Singleton
             }
         }
 
-        public void CrearArbol(List<Estructuras.Nodo> ListNodos, string nombreArchivo, string[] lineas)
+        public void CrearArbol(List<Estructuras.Nodo> ListNodos, string nombreArchivo, string[] lineas, string pathHuffman)
         {
             while (ListNodos.Count >= 2)
             {
@@ -91,10 +91,11 @@ namespace Lab_1.Singleton
             ListNodos.Clear();
             //Crear codigos prefijo y agregarlos a un diccionario de codigos prefijo de un archivo
             CodigoPrefijo(tree.raiz, nombreArchivo);
+            NombreArchivos.Add(nombreArchivo);
             CodigosPrefijo.Add(nombreArchivo, AuxCodigosPrefijo);
             codigo = "";
             //Para crear archivo que contenga el codigo binario
-            EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo, lineas);
+            EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo, lineas, pathHuffman);
         }
 
         static string codigo = "";
@@ -103,7 +104,7 @@ namespace Lab_1.Singleton
             if (nodo != null)
             {
                 CodigoPrefijo(nodo.izq, nombreArchivo);
-                if(nodo.Valor != ' ')
+                if(nodo.Valor != '\0')
                 {
                     Codigo(nodo);
                     AuxCodigosPrefijo.Add(nodo.Valor, codigo);
@@ -126,94 +127,59 @@ namespace Lab_1.Singleton
             }
         }
 
-        public void EscrituraHuffman(string FileName, Dictionary<char, string> dictionary, string[] lineas)
+        public void EscrituraHuffman(string FileName, Dictionary<char, string> dictionary, string[] lineas, string pathHuffman)
         {
-            var Text = "";
+            List<char> Text = new List<char>();
+            List<string> ListaAscii = new List<string>();
+
             foreach (var item in lineas)
             {
                 char[] caracteres = item.ToCharArray();
-
-                for (int i = 0; i < caracteres.Length; i++)
+                
+                foreach (var caracter in caracteres)
                 {
-                    foreach (var item2 in dictionary.Keys)
+                    char[] codigoPrefijo = dictionary[caracter].ToCharArray();
+                    foreach(var binario in codigoPrefijo)
                     {
-                        if (item2 == caracteres[i])
+                        Text.Add(binario);
+
+                        if (Text.Count >= 8)
                         {
-                            Text += dictionary[item2];
-                            break;
+                            string enlistado = "";
+                            int ascii = 0;
+                            foreach(var bin in Text)
+                            {
+                                enlistado += bin;
+                            }
+                            ascii = Convert.ToInt32(enlistado, 2);
+                            ListaAscii.Add(ascii.ToString());
+                            Text.Clear();
                         }
-
                     }
-                }  
+                }
             }
-            ConvertirADecimalYEscrituraTXT(Text, dictionary);
-            System.IO.File.WriteAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", Text);
-            //string DireccionArchivo = "C:\\Users\\Marcos Andrés CM\\Desktop\\Cuarto ciclo 2019\\EDII\\PRUEBAS PARA LAB";
 
-            //using (FileStream flujoArchivo = new FileStream(DireccionArchivo, FileAccess.Write, FileShare.None)) ;
-            /*StreamWriter archivo = new StreamWriter("C:\\Users\\Marcos Andrés CM\\Desktop\\Cuarto ciclo 2019\\EDII\\PRUEBAS PARA LAB");
-            foreach (var item in dictionary.Values)
+            string TextoComprimido = "";
+            foreach(var item in ListaAscii)
             {
-                archivo.WriteLine(item);
+                char ascii = Convert.ToChar(Convert.ToByte(item));
+                TextoComprimido += ascii;
             }
-            archivo.Close();*/
-        }
-        public void ConvertirADecimalYEscrituraTXT(string Text, Dictionary<char, string> dictionary)
-        {
-            var respuesta = "";
-            var enlistado = 0;
-            var ascii = string.Empty;
-            List<string> decimales = new List<string>(); //Lista que almacenara los 8 bits
-            for (int i = 0; i < Text.Length; i += 8)
-            {
-                respuesta = Text.Substring(i, 8);
-                enlistado = Convert.ToInt32(respuesta, 2);
-                decimales.Add(enlistado.ToString());
-            }
-            //NO BORRAR ESTO. ESTO ES UNA DE LAS DOS FORMAS PARA OBTENER EN ASCII
-            
-            /*for (int i = 0; i < decimales.Count; i++)
-            {
-                char asciiCode = Convert.ToChar(decimales[i]);
-                ascii += asciiCode;
-            }*/
 
-            List <string> keys = new List<string>();
-            List<string> values = new List<string>();
+            string answer = "";
 
-            foreach (var item in dictionary.Keys)
-            {
-                keys.Add(item.ToString());
-            }
-            foreach (var item2 in dictionary.Values)
-            {
-                values.Add(item2);
-            }
-            var answer = "";
-            for (int i = 0; i < keys.Count; i++)
-            {
-                answer = keys[i] + "|" + values[i] + ",";
-                System.IO.File.AppendAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", answer);
+            var DicAux = CodigosPrefijo[FileName];
 
-            }
-            for (int i = 0; i < decimales.Count; i++)
+            foreach (var codigo in DicAux)
             {
-                ascii += (char)Convert.ToByte(decimales[i].Substring(0, decimales[i].Length));
-
+                    answer += codigo.Key + "|" + codigo.Value + ",";
             }
-            
-            using (StreamWriter tr2 = File.AppendText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt"))
+
+            using (StreamWriter archivo = new StreamWriter(pathHuffman + "//" + FileName + ".huff"))
             {
-                tr2.WriteLine(ascii);
+                archivo.WriteLine(answer);
+                archivo.WriteLine(TextoComprimido);
             }
-            //var lectura = "";
-            //StreamReader tr = new StreamReader(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt");
-            //while ((lectura = tr.ReadLine()) == null)
-            //{
-            //    //System.IO.File.WriteAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", ascii);
-            //}
-            //System.IO.File.AppendAllText(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", ascii);
-
         }
     }
 }

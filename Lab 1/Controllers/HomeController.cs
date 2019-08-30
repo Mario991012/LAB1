@@ -30,12 +30,13 @@ namespace Lab_1.Controllers
                     string model = "";
                     SeCargoDiccionario = true;
                     model = Server.MapPath("~/Archivo.txt");
+                    string UbicacionHuffman = Server.MapPath("~//Archivos Huffman");
                     file.SaveAs(model);
-                    if (Data.Instancia.Lectura(model, nombreArchivo) == 1)
+                    if (Data.Instancia.Lectura(model, nombreArchivo, UbicacionHuffman) == 1)
                     {
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
-                        return RedirectToAction("CargaCorrecta");
+                        return RedirectToAction("ListaArchivos");
                     }
                     else
                     {
@@ -55,10 +56,8 @@ namespace Lab_1.Controllers
             }
         }
 
-        public ActionResult CargaCorrecta()
+        public ActionResult ListaArchivos()
         {
-            ViewBag.Message = "Your contact page.";
-
             return View();
         }
         public ActionResult CargaIncorrecta()

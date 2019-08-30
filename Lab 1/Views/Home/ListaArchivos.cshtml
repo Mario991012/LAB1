@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Lab_1.Models.Archivos>
+
+@{
+    ViewBag.Title = "ListaArchivos";
+}
+
+<h2>ListaArchivos</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.NombreArchivo)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Lab_1.Singleton.Data.Instancia.NombreArchivos) {
+    <tr>
+        <td>
+            @item
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+        </td>
+    </tr>
+}
+
+</table>
