@@ -162,14 +162,25 @@ namespace Lab_1.Singleton
         {
             var respuesta = "";
             var enlistado = 0;
-            List<int> decimales = new List<int>(); //Lista que almacenara los 8 bits
-            for (int i = 0; i < Text.Length; i+= 8)
+            var ascii = "";
+            List<string> decimales = new List<string>(); //Lista que almacenara los 8 bits
+            for (int i = 0; i < Text.Length; i += 8)
             {
-                respuesta = Text.Substring(i,8);
-                enlistado= Convert.ToInt32(respuesta, 2);
-                decimales.Add(enlistado);
+                respuesta = Text.Substring(i, 8);
+                enlistado = Convert.ToInt32(respuesta, 2);
+                decimales.Add(enlistado.ToString());
             }
+            
+            //System.IO.File.WriteAllLines(@"C:\Users\Marcos Andrés CM\Desktop\Cuarto ciclo 2019\EDII\PRUEBAS PARA LAB\FileName.txt", decimales);
 
+            foreach (var item in decimales)
+            {
+                for (int i = 0; i < item.Length; i+=3)
+                {
+                    ascii += (char)Convert.ToByte(item.Substring(i,3));
+                }
+            }
+            //System.Text.Encoding.ASCII.GetString();
         }
     }
 }
