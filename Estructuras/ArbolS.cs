@@ -12,7 +12,7 @@ namespace Estructuras
 
         public ArbolS()
         {
-            raiz = null;
+            raiz = new Nodo();
         }
     }
 }

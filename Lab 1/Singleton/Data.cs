@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.IO;
-using System.Collections;
-using Newtonsoft.Json;
-
+using Lab_1.Models;
 namespace Lab_1.Singleton
 {
     public class Data
@@ -29,15 +25,17 @@ namespace Lab_1.Singleton
         public List<Estructuras.Nodo> ListaNodos = new List<Estructuras.Nodo>();
         public Dictionary<char, string> AuxCodigosPrefijo = new Dictionary<char, string>();
         public List<string> NombreArchivos = new List<string>();
+        public Dictionary<string, Archivos> DatosDeArchivos = new Dictionary<string, Archivos>();
+
         public int Lectura(string path, string nombreArchivo, string pathHuffman)
         {
             try
             {
-                string[] lineas = File.ReadAllLines(path);
+                var lineas = File.ReadAllLines(path);
                 
                 foreach (var item in lineas)
                 {
-                    char[] caracteres = item.ToCharArray();
+                    var caracteres = item.ToCharArray();
                     for (int i = 0; i < caracteres.Length; i++)
                     {
                         if (Frecuencias.ContainsKey(caracteres[i]) == false)
@@ -80,76 +78,94 @@ namespace Lab_1.Singleton
                 padre.Frecuencia = padre.izq.Frecuencia + padre.der.Frecuencia;
                 ListNodos[0].padre = padre;
                 ListNodos[1].padre = padre;
-                ListNodos.Add(padre);
+                var cont = 0;
+                var agregado = false;
+                foreach (var item in ListNodos)
+                {
+                    cont++;
+                    if(padre.Frecuencia <= item.Frecuencia)
+                    {
+                        ListNodos.Insert(cont - 1, padre);
+                        agregado = true;
+                        break;
+                    }
+                }
+                if(agregado == false)
+                {
+                    ListNodos.Add(padre);
+                }
                 ListNodos.Remove(ListNodos[0]);
                 ListNodos.Remove(ListNodos[0]);
-                ListaNodos.Sort((x, y) => x.CompareTo(y));
 
             }
             Estructuras.ArbolS tree = new Estructuras.ArbolS();
             tree.raiz = ListNodos[0];
             ListNodos.Clear();
             //Crear codigos prefijo y agregarlos a un diccionario de codigos prefijo de un archivo
-            CodigoPrefijo(tree.raiz, nombreArchivo);
+            ObteniendoCodigoPrefijo(tree.raiz, nombreArchivo);
             NombreArchivos.Add(nombreArchivo);
             CodigosPrefijo.Add(nombreArchivo, AuxCodigosPrefijo);
             codigo = "";
             //Para crear archivo que contenga el codigo binario
             EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo, lineas, pathHuffman);
+
+            
         }
 
         static string codigo = "";
-        public void CodigoPrefijo(Estructuras.Nodo nodo, string nombreArchivo)
+        public void ObteniendoCodigoPrefijo(Estructuras.Nodo nodo, string nombreArchivo)
         {
             if (nodo != null)
             {
-                CodigoPrefijo(nodo.izq, nombreArchivo);
+                ObteniendoCodigoPrefijo(nodo.izq, nombreArchivo);
                 if(nodo.Valor != '\0')
                 {
-                    Codigo(nodo);
+                    ConcatenandoCodigoPrefijo(nodo);
                     AuxCodigosPrefijo.Add(nodo.Valor, codigo);
                     codigo = "";
                 }
-                CodigoPrefijo(nodo.der, nombreArchivo);
+                ObteniendoCodigoPrefijo(nodo.der, nombreArchivo);
             }
         }
 
-        public void Codigo(Estructuras.Nodo nodo)
+        public void ConcatenandoCodigoPrefijo(Estructuras.Nodo nodo)
         {
             if(nodo.recorridoIzq == true)
             {
                 codigo = "0" + codigo;
-                Codigo(nodo.padre);
-            }else if(nodo.recorridoDer == true)
+                ConcatenandoCodigoPrefijo(nodo.padre);
+            }
+            else if(nodo.recorridoDer == true)
             {
                 codigo = "1" + codigo;
-                Codigo(nodo.padre);
+                ConcatenandoCodigoPrefijo(nodo.padre);
             }
+            
         }
 
-        public void EscrituraHuffman(string FileName, Dictionary<char, string> dictionary, string[] lineas, string pathHuffman)
+        public void EscrituraHuffman(string FileName, Dictionary<char, string> DiccionarioCP, string[] lineas, string pathHuffman)
         {
-            List<char> Text = new List<char>();
-            List<string> ListaAscii = new List<string>();
+            var Text = new List<char>();
+            var ListaAscii = new List<string>();
 
             foreach (var item in lineas)
             {
-                char[] caracteres = item.ToCharArray();
-                
+                var caracteres = item.ToCharArray();
+
                 foreach (var caracter in caracteres)
                 {
-                    char[] codigoPrefijo = dictionary[caracter].ToCharArray();
-                    foreach(var binario in codigoPrefijo)
+                    var codigoPrefijo = DiccionarioCP[caracter].ToCharArray();
+                    foreach (var binario in codigoPrefijo)
                     {
                         Text.Add(binario);
 
                         if (Text.Count >= 8)
                         {
-                            string enlistado = "";
-                            int ascii = 0;
-                            foreach(var bin in Text)
+                            var enlistado = "";
+                            var ascii = 0;
+                            foreach (var bin in Text)
                             {
-                                enlistado += bin;
+                                enlistado = $"{enlistado}{bin}";
                             }
                             ascii = Convert.ToInt32(enlistado, 2);
                             ListaAscii.Add(ascii.ToString());
@@ -159,27 +175,28 @@ namespace Lab_1.Singleton
                 }
             }
 
-            string TextoComprimido = "";
-            foreach(var item in ListaAscii)
+            var TextoComprimido = "";
+            foreach (var item in ListaAscii)
             {
-                char ascii = Convert.ToChar(Convert.ToByte(item));
+                var ascii = Convert.ToChar(Convert.ToByte(item));
                 TextoComprimido += ascii;
             }
 
-            string answer = "";
+            var answer = "";
 
             var DicAux = CodigosPrefijo[FileName];
 
             foreach (var codigo in DicAux)
             {
-                    answer += codigo.Key + "|" + codigo.Value + ",";
+                answer = $"{answer}{codigo.Key}|{codigo.Value}|";
             }
 
-            using (StreamWriter archivo = new StreamWriter(pathHuffman + "//" + FileName + ".huff"))
+            using (StreamWriter archivo = new StreamWriter($"{pathHuffman}//{FileName}.huff"))
             {
                 archivo.WriteLine(answer);
                 archivo.WriteLine(TextoComprimido);
             }
+            AuxCodigosPrefijo.Clear();
         }
     }
 }

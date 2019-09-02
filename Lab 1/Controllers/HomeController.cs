@@ -1,12 +1,14 @@
-﻿using System.Web;
+﻿using System.IO;
+using System.Web;
 using System.Web.Mvc;
 using Lab_1.Singleton;
+using Lab_1.Models;
+using System;
 
 namespace Lab_1.Controllers
 {
     public class HomeController : Controller
     {
-        static bool SeCargoDiccionario = false;
         public ActionResult Index()
         {
             return View();
@@ -17,23 +19,37 @@ namespace Lab_1.Controllers
             return View();
         }
 
+
+        
+
         [HttpPost]
         public ActionResult Carga(HttpPostedFileBase file)
         {
-            string nombreArchivo = file.FileName;
-            string[] nombre = nombreArchivo.Split('.');
+            var nombreArchivo = file.FileName;
+            var nombre = nombreArchivo.Split('.');
             nombreArchivo = nombre[0];
+            var PesoOriginal = file.ContentLength;
             try
             {
                 if (file != null && file.ContentLength > 0)
                 {
                     string model = "";
-                    SeCargoDiccionario = true;
-                    model = Server.MapPath("~/Archivo.txt");
+                    model = Server.MapPath($"~/Archivos Originales/{nombreArchivo}");
                     string UbicacionHuffman = Server.MapPath("~//Archivos Huffman");
                     file.SaveAs(model);
                     if (Data.Instancia.Lectura(model, nombreArchivo, UbicacionHuffman) == 1)
                     {
+                        var RutaArchivoCompreso = Server.MapPath($"~/Archivos Huffman/{nombreArchivo}.huff");
+                        FileInfo ArchivoCompreso = new FileInfo(RutaArchivoCompreso);
+                        var PesoCompreso = ArchivoCompreso.Length;
+                        
+                        var Archivo = new Archivos();
+                        Archivo.NombreArchivo = nombreArchivo;
+                        Archivo.Razon = ((double)((int)((PesoOriginal/PesoCompreso) * 1000.0))) / 1000.0;
+                        Archivo.Factor = Math.Truncate(Convert.ToDouble(PesoCompreso / PesoOriginal)); 
+                        Archivo.Porcentaje = Math.Truncate(Convert.ToDouble(1 - Archivo.Factor));
+                        Data.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
+
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
                         return RedirectToAction("ListaArchivos");
@@ -52,7 +68,8 @@ namespace Lab_1.Controllers
             }
             catch
             {
-                return ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+                ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+                return View();
             }
         }
 

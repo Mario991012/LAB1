@@ -7,26 +7,39 @@
 <h2>ListaArchivos</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Regresar a Menu", "Index")
 </p>
 <table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.NombreArchivo)
         </th>
-        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Razon)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Factor)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Porcentaje)
+        </th>
     </tr>
 
-@foreach (var item in Lab_1.Singleton.Data.Instancia.NombreArchivos) {
+@foreach (var item in Lab_1.Singleton.Data.Instancia.DatosDeArchivos) {
     <tr>
         <td>
-            @item
+            @item.Value.NombreArchivo
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            @item.Value.Razon
         </td>
+        <td>
+            @item.Value.Factor
+        </td>
+        <td>
+            @item.Value.Porcentaje
+        </td>
+
     </tr>
 }
 
