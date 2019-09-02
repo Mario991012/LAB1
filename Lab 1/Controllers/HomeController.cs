@@ -57,7 +57,7 @@ namespace Lab_1.Controllers
                     else
                     {
                         ViewBag.Msg = "Carga del archivo incorrecta";
-                        return RedirectToAction("CargaIncorrecta");
+                        return View();
                     }
                 }
                 else
@@ -77,11 +77,6 @@ namespace Lab_1.Controllers
         {
             return View();
         }
-        public ActionResult CargaIncorrecta()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
+        
     }
 }

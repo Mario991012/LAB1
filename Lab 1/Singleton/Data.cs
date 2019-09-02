@@ -24,6 +24,7 @@ namespace Lab_1.Singleton
         public Dictionary<char, int> Frecuencias = new Dictionary<char, int>();
         public List<Estructuras.Nodo> ListaNodos = new List<Estructuras.Nodo>();
         public Dictionary<char, string> AuxCodigosPrefijo = new Dictionary<char, string>();
+        public Dictionary<string, string> DescompCodigosPrefijo = new Dictionary<string, string>();
         public List<string> NombreArchivos = new List<string>();
         public Dictionary<string, Archivos> DatosDeArchivos = new Dictionary<string, Archivos>();
 
@@ -198,5 +199,39 @@ namespace Lab_1.Singleton
             }
             AuxCodigosPrefijo.Clear();
         }
-    }
+
+
+        public void Descompresion(string path, string nombreArchivo, string pathHuffman)
+        {
+            try
+            {
+                var lineas = File.ReadAllLines(path);
+                var cont = 0;
+
+                foreach (var item in lineas)
+                {
+                    if(cont == 0)
+                    {
+                        var CP = item.Split('|');
+                        for (int i = 0; i < CP.Length; i++)
+                        {
+                            DescompCodigosPrefijo.Add(CP[i + 1], CP[i]);
+                        }
+                    }
+                    else
+                    {
+                        //CONVERTIR A BINARIO CADA CARACTER
+                        //CONCATENAR CADA CARACTER Y VALIDAR QUE SEA MENOR A 8
+                        //ANALIZAR EN GRUPO DE 8 SI EXISTE CODIGO PREFIJO
+                        //ESCRIBIR CARACTER POR CODIGO PREFIJO
+                    }
+                }
+
+            }
+            catch
+            {
+                return 0;
+            }
+
+        }
 }
