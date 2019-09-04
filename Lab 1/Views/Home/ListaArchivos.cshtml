@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<Lab_1.Models.Archivos>
 
 @{
-    ViewBag.Title = "ListaArchivos";
+    ViewBag.Title = "HUFFMAN: Archivos Comprimidos";
 }
 
-<h2>ListaArchivos</h2>
+    <h2>ViewBag.Title</h2>
 
 <p>
     @Html.ActionLink("Regresar a Menu", "Index")
@@ -37,7 +37,7 @@
             @item.Value.Factor
         </td>
         <td>
-            @item.Value.Porcentaje
+            @item.Value.Porcentaje %
         </td>
 
     </tr>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Lab_1.Models;
 namespace Lab_1.Singleton
 {
@@ -19,7 +20,7 @@ namespace Lab_1.Singleton
             }
         }
 
-        public Dictionary<string, Dictionary<char, string>> CodigosPrefijo = new Dictionary<string, Dictionary<char, string>>(); 
+        public Dictionary<string, Dictionary<char, string>> CodigosPrefijo = new Dictionary<string, Dictionary<char, string>>();
         public Estructuras.ArbolS Arbol = new Estructuras.ArbolS();
         public Dictionary<char, int> Frecuencias = new Dictionary<char, int>();
         public List<Estructuras.Nodo> ListaNodos = new List<Estructuras.Nodo>();
@@ -28,12 +29,12 @@ namespace Lab_1.Singleton
         public List<string> NombreArchivos = new List<string>();
         public Dictionary<string, Archivos> DatosDeArchivos = new Dictionary<string, Archivos>();
 
-        public int Lectura(string path, string nombreArchivo, string pathHuffman)
+        public int Lectura(string path, string[] nombreArchivo, string pathHuffman)
         {
-            try
-            {
+            //try
+            //{
                 var lineas = File.ReadAllLines(path);
-                
+
                 foreach (var item in lineas)
                 {
                     var caracteres = item.ToCharArray();
@@ -50,7 +51,7 @@ namespace Lab_1.Singleton
                     }
                 }
 
-                foreach(var nodos in Frecuencias)
+                foreach (var nodos in Frecuencias)
                 {
                     Estructuras.Nodo nodo = new Estructuras.Nodo();
                     nodo.Frecuencia = nodos.Value;
@@ -60,14 +61,14 @@ namespace Lab_1.Singleton
                 }
                 CrearArbol(ListaNodos, nombreArchivo, lineas, pathHuffman);
                 return 1;
-            }
-            catch
-            {
-                return 0;
-            }
+            //}
+            //catch
+            //{
+            //    return 0;
+            //}
         }
 
-        public void CrearArbol(List<Estructuras.Nodo> ListNodos, string nombreArchivo, string[] lineas, string pathHuffman)
+        public void CrearArbol(List<Estructuras.Nodo> ListNodos, string[] nombreArchivo, string[] lineas, string pathHuffman)
         {
             while (ListNodos.Count >= 2)
             {
@@ -84,67 +85,87 @@ namespace Lab_1.Singleton
                 foreach (var item in ListNodos)
                 {
                     cont++;
-                    if(padre.Frecuencia <= item.Frecuencia)
+                    if (padre.Frecuencia <= item.Frecuencia)
                     {
                         ListNodos.Insert(cont - 1, padre);
                         agregado = true;
                         break;
                     }
                 }
-                if(agregado == false)
+
+                if (agregado == false)
                 {
                     ListNodos.Add(padre);
                 }
+
                 ListNodos.Remove(ListNodos[0]);
                 ListNodos.Remove(ListNodos[0]);
 
             }
+
             Estructuras.ArbolS tree = new Estructuras.ArbolS();
             tree.raiz = ListNodos[0];
             ListNodos.Clear();
             //Crear codigos prefijo y agregarlos a un diccionario de codigos prefijo de un archivo
-            ObteniendoCodigoPrefijo(tree.raiz, nombreArchivo);
-            NombreArchivos.Add(nombreArchivo);
-            CodigosPrefijo.Add(nombreArchivo, AuxCodigosPrefijo);
+            ObteniendoCodigoPrefijo(tree.raiz);
+            NombreArchivos.Add(nombreArchivo[0]);
+            CodigosPrefijo.Add(nombreArchivo[0], AuxCodigosPrefijo);
             codigo = "";
             //Para crear archivo que contenga el codigo binario
             EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo, lineas, pathHuffman);
 
-            
+
         }
 
         static string codigo = "";
-        public void ObteniendoCodigoPrefijo(Estructuras.Nodo nodo, string nombreArchivo)
+        public void ObteniendoCodigoPrefijo(Estructuras.Nodo nodo)
         {
             if (nodo != null)
             {
-                ObteniendoCodigoPrefijo(nodo.izq, nombreArchivo);
-                if(nodo.Valor != '\0')
+                ObteniendoCodigoPrefijo(nodo.izq);
+                if (nodo.Valor != 'N')
+                {
+                    ConcatenandoCodigoPrefijo(nodo);
+                    AuxCodigosPrefijo.Add(nodo.Valor, codigo);
+                    codigo = "";
+                }else if (nodo.Valor == 'N' && nodo.izq == null && nodo.der == null)
                 {
                     ConcatenandoCodigoPrefijo(nodo);
                     AuxCodigosPrefijo.Add(nodo.Valor, codigo);
                     codigo = "";
                 }
-                ObteniendoCodigoPrefijo(nodo.der, nombreArchivo);
+                ObteniendoCodigoPrefijo(nodo.der);
             }
         }
 
         public void ConcatenandoCodigoPrefijo(Estructuras.Nodo nodo)
         {
-            if(nodo.recorridoIzq == true)
+            if (nodo.recorridoIzq == true)
             {
                 codigo = "0" + codigo;
                 ConcatenandoCodigoPrefijo(nodo.padre);
             }
-            else if(nodo.recorridoDer == true)
+            else if (nodo.recorridoDer == true)
             {
                 codigo = "1" + codigo;
                 ConcatenandoCodigoPrefijo(nodo.padre);
             }
-            
+
         }
 
-        public void EscrituraHuffman(string FileName, Dictionary<char, string> DiccionarioCP, string[] lineas, string pathHuffman)
+        public static string ValidateUtf8(char txt)
+        {
+            StringBuilder sbOutput = new StringBuilder();
+            char ch;
+                ch = txt;
+                if ((ch >= 0x0020 && ch <= 0xD7FF) ||(ch >= 0xE000 && ch <= 0xFFFD) ||ch == 0x0009 ||ch == 0x000A ||ch == 0x000D || ch == 0xD9F0)
+                {
+                    sbOutput.Append(ch);
+                }
+            return sbOutput.ToString();
+        }
+
+        public void EscrituraHuffman(string[] FileName, Dictionary<char, string> DiccionarioCP, string[] lineas, string pathHuffman)
         {
             var Text = new List<char>();
             var ListaAscii = new List<string>();
@@ -180,20 +201,23 @@ namespace Lab_1.Singleton
             foreach (var item in ListaAscii)
             {
                 var ascii = Convert.ToChar(Convert.ToByte(item));
-                TextoComprimido += ascii;
+                var utf8Text = ValidateUtf8(ascii);
+                TextoComprimido = $"{TextoComprimido}{utf8Text}";
             }
 
             var answer = "";
 
-            var DicAux = CodigosPrefijo[FileName];
+            var DicAux = CodigosPrefijo[FileName[0]];
 
             foreach (var codigo in DicAux)
             {
                 answer = $"{answer}{codigo.Key}|{codigo.Value}|";
             }
 
-            using (StreamWriter archivo = new StreamWriter($"{pathHuffman}//{FileName}.huff"))
+
+            using (StreamWriter archivo = new StreamWriter($"{pathHuffman}//{FileName[0]}.huff"))
             {
+                archivo.WriteLine(FileName[1]);
                 archivo.WriteLine(answer);
                 archivo.WriteLine(TextoComprimido);
             }
@@ -201,7 +225,7 @@ namespace Lab_1.Singleton
         }
 
 
-        public void Descompresion(string path, string nombreArchivo, string pathHuffman)
+        public int Descompresion(string path, string nombreArchivo, string pathHuffman)
         {
             try
             {
@@ -210,7 +234,7 @@ namespace Lab_1.Singleton
 
                 foreach (var item in lineas)
                 {
-                    if(cont == 0)
+                    if (cont == 0)
                     {
                         var CP = item.Split('|');
                         for (int i = 0; i < CP.Length; i++)
@@ -226,7 +250,7 @@ namespace Lab_1.Singleton
                         //ESCRIBIR CARACTER POR CODIGO PREFIJO
                     }
                 }
-
+                return 1;
             }
             catch
             {
@@ -234,4 +258,5 @@ namespace Lab_1.Singleton
             }
 
         }
+    }
 }
