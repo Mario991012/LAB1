@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "Escoja la opcion deseada";
+}
+
+<h2>MENÚ PRINCIPAL</h2>
+
+<h4>@ViewBag.Mensaje</h4>
+
+<div class="jumbotron" style="color:chocolate">
+    <h2 class="display-3"> HUFFMAN: Compresión</h2>
+    <h4 class="display-3"> Comprima el archivo que desee</h4>
+    <p class="lead">
+
+        <h4>HUFFMAN</h4>
+        <h4><button type="button" onclick="location.href= '@Url.Action("CargaParaComprimir","Home")'">Compresion </button></h4>
+
+    </p>
+</div>
+
+<div class="jumbotron" style="color:chocolate">
+    <h2 class="display-3"> HUFFMAN: Descompresión</h2>
+    <h4 class="display-3"> Descomprima el archivo escogido</h4>
+    <p class="lead">
+
+        <h4>HUFFMAN</h4>
+        <h4><button type="button" onclick="location.href= '@Url.Action("CargaParaDescomprimir","Home")'">Descompresion </button></h4>
+
+    </p>
+</div>

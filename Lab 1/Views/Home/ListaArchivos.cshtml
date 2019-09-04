@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Lab_1.Models.Archivos>
+
+@{
+    ViewBag.Title = "HUFFMAN: Archivos Comprimidos";
+}
+
+    <h2>ViewBag.Title</h2>
+
+<p>
+    @Html.ActionLink("Regresar a Menu", "Index")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.NombreArchivo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Razon)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Factor)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Porcentaje)
+        </th>
+    </tr>
+
+@foreach (var item in Lab_1.Singleton.Data.Instancia.DatosDeArchivos) {
+    <tr>
+        <td>
+            @item.Value.NombreArchivo
+        </td>
+        <td>
+            @item.Value.Razon
+        </td>
+        <td>
+            @item.Value.Factor
+        </td>
+        <td>
+            @item.Value.Porcentaje %
+        </td>
+
+    </tr>
+}
+
+</table>
