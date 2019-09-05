@@ -222,6 +222,7 @@ namespace Lab_1.Singleton
             {
                 archivo.WriteLine(FileName[1]);
                 archivo.WriteLine(answer);
+                archivo.WriteLine("-");
                 archivo.WriteLine(TextoComprimido);
             }
             AuxCodigosPrefijo.Clear();
@@ -234,14 +235,29 @@ namespace Lab_1.Singleton
             try
             {
                 var lineas = File.ReadAllLines(path);
-                var separador = lineas[1].Split('|');
-                var sep = separador.Length;
-                for (int i = 0; i < separador.Length-1; i += 2)
+                var indexseparador = 0;
+                for (int i = 0; i < lineas.Length; i++)
                 {
-                    CodigoPD.Add(separador[i + 1], Convert.ToChar(separador[i]));
+                    if(lineas[i] == "-")
+                    {
+                        break;
+                    }else
+                    {
+                        indexseparador++;
+                    }
                 }
 
-                for (int i = 2; i < lineas.Length; i++)
+                for (int k = 0; k < indexseparador; k++)
+                {
+                    var separador = lineas[k].Split('|');
+                    var sep = separador.Length;
+                    for (int i = 0; i < separador.Length - 1; i += 2)
+                    {
+                        CodigoPD.Add(separador[i + 1], Convert.ToChar(separador[i]));
+                    }
+                }
+
+                for (int i = indexseparador + 1; i < lineas.Length; i++)
                 {
                     if (lineas[i].Length >0)
                     {
@@ -255,25 +271,7 @@ namespace Lab_1.Singleton
                     }     
                 }
                 ObtenerCaracter(BinaryList, CodigoPD);
- 
-                //foreach (var item in lineas)
-                //{
-                //    if (cont == 0)
-                //    {
-                //        var CP = item.Split('|');
-                //        for (int i = 0; i < CP.Length; i++)
-                //        {
-                //            DescompCodigosPrefijo.Add(CP[i + 1], CP[i]);
-                //        }
-                //    }
-                //    else
-                //    {
-                //        //CONVERTIR A BINARIO CADA CARACTER
-                //        //CONCATENAR CADA CARACTER Y VALIDAR QUE SEA MENOR A 8
-                //        //ANALIZAR EN GRUPO DE 8 SI EXISTE CODIGO PREFIJO
-                //        //ESCRIBIR CARACTER POR CODIGO PREFIJO
-                //    }
-                //}
+
                 return 1;
             }
             catch
@@ -282,47 +280,55 @@ namespace Lab_1.Singleton
             }      
         }
 
+        static int CountOfBytes = 0;
+        static string FinalText = "";
+        static string BinaryC = "";
+        static bool Chequeo = false;
+        static int PosicionLinea = 0;
         public void ObtenerCaracter(List<string> BinaryList, Dictionary<string, char> CodigoPD)
         {
-            for (int i = 0; i < BinaryList.Count; i++)
+            var CharOfBytes = BinaryList[PosicionLinea].ToCharArray(); //vector que cada elemento sera un 0 o 1 del binario
+                
+            do
             {
-                var CharOfBytes = BinaryList[i].ToCharArray(); //vector que cada elemento sera un 0 o 1 del binario
-                var CountOfBytes = 0;
-                var FinalText = "";
-                var BinaryC = "";
-                var Chequeo = false;
-                BinaryC += CharOfBytes[CountOfBytes];
-
+                if(CountOfBytes == CharOfBytes.Length)
+                {
+                    CountOfBytes = 0;
+                    PosicionLinea++;
+                    CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
+                }
+                BinaryC = $"{BinaryC}{CharOfBytes[CountOfBytes]}";
+                CountOfBytes++;
                 RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref FinalText, ref Chequeo, BinaryC);
-                if ((Chequeo == false) && CountOfBytes <CharOfBytes.Length)
-                {
-                    CountOfBytes++;
-                    BinaryC += CharOfBytes[CountOfBytes];
-                    RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref FinalText, ref Chequeo, BinaryC);
+            } while ((Chequeo == false) && CountOfBytes == CharOfBytes.Length);
 
-                }
-                else if ((Chequeo == false) && CountOfBytes >= CharOfBytes.Length)//Se deben de concatenar 2 binarios
+            if ((Chequeo == false) && CountOfBytes >= CharOfBytes.Length)//Se deben de concatenar 2 binarios
+            {
+                CountOfBytes = 0;
+                PosicionLinea++;
+                ObtenerCaracter(BinaryList, CodigoPD);
+            }
+            else if(Chequeo == true)
+            {
+                BinaryC = "";
+                if(CountOfBytes == CharOfBytes.Length)
                 {
-                    CountOfBytes++;
-                    BinaryC += CharOfBytes[CountOfBytes];
-                    RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref FinalText, ref Chequeo, BinaryC);
-
+                    PosicionLinea++;
+                    CountOfBytes = 0;
                 }
+                Chequeo = false;
+                ObtenerCaracter(BinaryList, CodigoPD);
             }
 
-            //ESCRIBIR EN ARCHIVO EL TEXTO YA DESCOMPRIMIDO
         }
         public void RecorrerBinaryListRecursivamente(List<string> BinaryList, Dictionary<string, char> CodigoPD, ref string FinalText, ref bool chequeo, string BinaryC)
         {
-            foreach (var item in CodigoPD.Keys)
-            {
-                if (item == BinaryC)
+                if (CodigoPD.ContainsKey(BinaryC))
                 {
-                    FinalText += CodigoPD[item];
+                    FinalText = $"{FinalText}{CodigoPD[BinaryC]}";
                     chequeo = true;
                     //BinaryList.Remove();
                 }
-            }
         }
         #endregion
     }
