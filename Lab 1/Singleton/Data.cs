@@ -281,8 +281,48 @@ namespace Lab_1.Singleton
                return 0;
             }      
         }
+
         public void ObtenerCaracter(List<string> BinaryList, Dictionary<string, char> CodigoPD)
         {
+            for (int i = 0; i < BinaryList.Count; i++)
+            {
+                var CharOfBytes = BinaryList[i].ToCharArray(); //vector que cada elemento sera un 0 o 1 del binario
+                var CountOfBytes = 0;
+                var FinalText = "";
+                var BinaryC = "";
+                var Chequeo = false;
+                BinaryC += CharOfBytes[CountOfBytes];
+
+                RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref FinalText, ref Chequeo, BinaryC);
+                if ((Chequeo == false) && CountOfBytes <CharOfBytes.Length)
+                {
+                    CountOfBytes++;
+                    BinaryC += CharOfBytes[CountOfBytes];
+                    RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref FinalText, ref Chequeo, BinaryC);
+
+                }
+                else if ((Chequeo == false) && CountOfBytes >= CharOfBytes.Length)//Se deben de concatenar 2 binarios
+                {
+                    CountOfBytes++;
+                    BinaryC += CharOfBytes[CountOfBytes];
+                    RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref FinalText, ref Chequeo, BinaryC);
+
+                }
+            }
+
+            //ESCRIBIR EN ARCHIVO EL TEXTO YA DESCOMPRIMIDO
+        }
+        public void RecorrerBinaryListRecursivamente(List<string> BinaryList, Dictionary<string, char> CodigoPD, ref string FinalText, ref bool chequeo, string BinaryC)
+        {
+            foreach (var item in CodigoPD.Keys)
+            {
+                if (item == BinaryC)
+                {
+                    FinalText += CodigoPD[item];
+                    chequeo = true;
+                    //BinaryList.Remove();
+                }
+            }
         }
         #endregion
     }
