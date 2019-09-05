@@ -34,8 +34,6 @@ namespace Lab_1.Singleton
 
         public int Lectura(string path, string[] nombreArchivo, string pathHuffman)
         {
-            //try
-            //{
                 var lineas = File.ReadAllLines(path);
 
                 foreach (var item in lineas)
@@ -64,11 +62,6 @@ namespace Lab_1.Singleton
                 }
                 CrearArbol(ListaNodos, nombreArchivo, lineas, pathHuffman);
                 return 1;
-            //}
-            //catch
-            //{
-            //    return 0;
-            //}
         }
 
         public void CrearArbol(List<Estructuras.Nodo> ListNodos, string[] nombreArchivo, string[] lineas, string pathHuffman)
@@ -201,29 +194,31 @@ namespace Lab_1.Singleton
             }
 
             var TextoComprimido = "";
-            foreach (var item in ListaAscii)
-            {
-                var ascii = Convert.ToChar(Convert.ToByte(item));
-                var utf8Text = ValidateUtf8(ascii);
-                TextoComprimido = $"{TextoComprimido}{utf8Text}";
-            }
+            
 
             var answer = "";
 
             var DicAux = CodigosPrefijo[FileName[0]];
 
-            foreach (var codigo in DicAux)
-            {
-                answer = $"{answer}{codigo.Key}|{codigo.Value}|";
-            }
+            
 
 
             using (StreamWriter archivo = new StreamWriter($"{pathHuffman}//{FileName[0]}.huff"))
             {
                 archivo.WriteLine(FileName[1]);
-                archivo.WriteLine(answer);
+                //archivo.WriteLine(answer);
+                foreach (var codigo in DicAux)
+                {
+                    archivo.Write($"{codigo.Key}|{codigo.Value}|");
+                }
                 archivo.WriteLine("-");
-                archivo.WriteLine(TextoComprimido);
+                //archivo.WriteLine(TextoComprimido);
+                foreach (var item in ListaAscii)
+                {
+                    var ascii = Convert.ToChar(Convert.ToByte(item));
+                    var utf8Text = ValidateUtf8(ascii);
+                    archivo.Write($"{utf8Text}");
+                }
             }
             AuxCodigosPrefijo.Clear();
         }
