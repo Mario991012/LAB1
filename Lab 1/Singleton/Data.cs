@@ -29,6 +29,9 @@ namespace Lab_1.Singleton
         public List<string> NombreArchivos = new List<string>();
         public Dictionary<string, Archivos> DatosDeArchivos = new Dictionary<string, Archivos>();
 
+        //Para descompresion
+        public Dictionary<string, char> CodigoPD = new Dictionary<string, char>(); 
+
         public int Lectura(string path, string[] nombreArchivo, string pathHuffman)
         {
             //try
@@ -224,39 +227,63 @@ namespace Lab_1.Singleton
             AuxCodigosPrefijo.Clear();
         }
 
-
+        #region Descompresion
         public int Descompresion(string path, string nombreArchivo, string pathHuffman)
         {
+            List<string> BinaryList = new List<string>();
             try
             {
                 var lineas = File.ReadAllLines(path);
-                var cont = 0;
-
-                foreach (var item in lineas)
+                var separador = lineas[1].Split('|');
+                var sep = separador.Length;
+                for (int i = 0; i < separador.Length-1; i += 2)
                 {
-                    if (cont == 0)
-                    {
-                        var CP = item.Split('|');
-                        for (int i = 0; i < CP.Length; i++)
-                        {
-                            DescompCodigosPrefijo.Add(CP[i + 1], CP[i]);
-                        }
-                    }
-                    else
-                    {
-                        //CONVERTIR A BINARIO CADA CARACTER
-                        //CONCATENAR CADA CARACTER Y VALIDAR QUE SEA MENOR A 8
-                        //ANALIZAR EN GRUPO DE 8 SI EXISTE CODIGO PREFIJO
-                        //ESCRIBIR CARACTER POR CODIGO PREFIJO
-                    }
+                    CodigoPD.Add(separador[i + 1], Convert.ToChar(separador[i]));
                 }
+
+                for (int i = 2; i < lineas.Length; i++)
+                {
+                    if (lineas[i].Length >0)
+                    {
+                        var asciiArray = lineas[i].ToCharArray();
+                        for (int j = 0; j < asciiArray.Length; j++)
+                        {
+                            var CharToInt = asciiArray[j].ToString();
+                            var BinaryCode = Convert.ToString(asciiArray[j],2);
+                            BinaryList.Add(BinaryCode);
+                        }
+                    }     
+                }
+                ObtenerCaracter(BinaryList, CodigoPD);
+ 
+                //foreach (var item in lineas)
+                //{
+                //    if (cont == 0)
+                //    {
+                //        var CP = item.Split('|');
+                //        for (int i = 0; i < CP.Length; i++)
+                //        {
+                //            DescompCodigosPrefijo.Add(CP[i + 1], CP[i]);
+                //        }
+                //    }
+                //    else
+                //    {
+                //        //CONVERTIR A BINARIO CADA CARACTER
+                //        //CONCATENAR CADA CARACTER Y VALIDAR QUE SEA MENOR A 8
+                //        //ANALIZAR EN GRUPO DE 8 SI EXISTE CODIGO PREFIJO
+                //        //ESCRIBIR CARACTER POR CODIGO PREFIJO
+                //    }
+                //}
                 return 1;
             }
             catch
             {
-                return 0;
-            }
-
+               return 0;
+            }      
         }
+        public void ObtenerCaracter(List<string> BinaryList, Dictionary<string, char> CodigoPD)
+        {
+        }
+        #endregion
     }
 }

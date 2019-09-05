@@ -78,7 +78,7 @@ namespace Lab_1.Controllers
         }
 
         [HttpPost]
-        public ActionResult CargaParaDescomprimir(HttpPostedFile file)
+        public ActionResult CargaParaDescomprimir(HttpPostedFileBase file)
         {
             var nombreArchivo = file.FileName;
             var nombre = nombreArchivo.Split('.');
@@ -86,7 +86,7 @@ namespace Lab_1.Controllers
             {
                 if (file != null && file.ContentLength > 0)
                 {
-                    var model = Server.MapPath($"~/Archivos Comprimidos Originales/{nombreArchivo}");
+                    var model = Server.MapPath($"~/Archivos Comprimidos/{nombreArchivo}");
 
                     var UbicacionDescomprimidos = Server.MapPath("~//Archivos Descomprimidos");
                     file.SaveAs(model);
