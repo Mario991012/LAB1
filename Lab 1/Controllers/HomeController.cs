@@ -26,8 +26,8 @@ namespace Lab_1.Controllers
             var nombre = nombreArchivo.Split('.');
             nombreArchivo = nombre[0];
             var PesoOriginal = Convert.ToDouble(file.ContentLength);
-            //try
-            //{
+            try
+            {
                 if (file != null && file.ContentLength > 0)
                 {
                     string model = "";
@@ -64,13 +64,13 @@ namespace Lab_1.Controllers
                     ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
                     return View();
                 }
-            //}
-            //catch
-            //{
-            //    ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
-            //    return View();
-            //}
         }
+            catch
+            {
+                ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+                return View();
+    }
+}
 
         public ActionResult CargaParaDescomprimir()
         {
@@ -78,7 +78,7 @@ namespace Lab_1.Controllers
         }
 
         [HttpPost]
-        public ActionResult CargaParaDescomprimir(HttpPostedFile file)
+        public ActionResult CargaParaDescomprimir(HttpPostedFileBase file)
         {
             var nombreArchivo = file.FileName;
             var nombre = nombreArchivo.Split('.');
@@ -86,7 +86,7 @@ namespace Lab_1.Controllers
             {
                 if (file != null && file.ContentLength > 0)
                 {
-                    var model = Server.MapPath($"~/Archivos Comprimidos Originales/{nombreArchivo}");
+                    var model = Server.MapPath($"~/Archivos Comprimidos/{nombreArchivo}");
 
                     var UbicacionDescomprimidos = Server.MapPath("~//Archivos Descomprimidos");
                     file.SaveAs(model);

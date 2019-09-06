@@ -20,52 +20,51 @@ namespace Lab_1.Singleton
             }
         }
 
-        public Dictionary<string, Dictionary<char, string>> CodigosPrefijo = new Dictionary<string, Dictionary<char, string>>();
+        public Dictionary<string, Dictionary<int, string>> CodigosPrefijo = new Dictionary<string, Dictionary<int, string>>();
         public Estructuras.ArbolS Arbol = new Estructuras.ArbolS();
         public Dictionary<char, int> Frecuencias = new Dictionary<char, int>();
         public List<Estructuras.Nodo> ListaNodos = new List<Estructuras.Nodo>();
-        public Dictionary<char, string> AuxCodigosPrefijo = new Dictionary<char, string>();
+        public Dictionary<int, string> AuxCodigosPrefijo = new Dictionary<int, string>();
         public Dictionary<string, string> DescompCodigosPrefijo = new Dictionary<string, string>();
         public List<string> NombreArchivos = new List<string>();
         public Dictionary<string, Archivos> DatosDeArchivos = new Dictionary<string, Archivos>();
+        public Dictionary<string, char> CodigoPD = new Dictionary<string, char>();
 
         public int Lectura(string path, string[] nombreArchivo, string pathHuffman)
         {
-            //try
-            //{
-                var lineas = File.ReadAllLines(path);
+            var lineas = File.ReadAllLines(path);
 
-                foreach (var item in lineas)
+            for (int i = 0; i < lineas.Length; i++)
+            {
+                lineas[i] = $"{lineas[i]}\r";
+            }
+
+            foreach (var item in lineas)
+            {
+                var caracteres = item.ToCharArray();
+                for (int i = 0; i < caracteres.Length; i++)
                 {
-                    var caracteres = item.ToCharArray();
-                    for (int i = 0; i < caracteres.Length; i++)
+                    if (Frecuencias.ContainsKey(caracteres[i]) == false)
                     {
-                        if (Frecuencias.ContainsKey(caracteres[i]) == false)
-                        {
-                            Frecuencias.Add(caracteres[i], 1);
-                        }
-                        else
-                        {
-                            Frecuencias[caracteres[i]] = Frecuencias[caracteres[i]] + 1;
-                        }
+                        Frecuencias.Add(caracteres[i], 1);
+                    }
+                    else
+                    {
+                        Frecuencias[caracteres[i]] = Frecuencias[caracteres[i]] + 1;
                     }
                 }
+            }
 
-                foreach (var nodos in Frecuencias)
-                {
-                    Estructuras.Nodo nodo = new Estructuras.Nodo();
-                    nodo.Frecuencia = nodos.Value;
-                    nodo.Valor = nodos.Key;
-                    ListaNodos.Add(nodo);
-                    ListaNodos.Sort((x, y) => x.CompareTo(y));
-                }
-                CrearArbol(ListaNodos, nombreArchivo, lineas, pathHuffman);
-                return 1;
-            //}
-            //catch
-            //{
-            //    return 0;
-            //}
+            foreach (var nodos in Frecuencias)
+            {
+                Estructuras.Nodo nodo = new Estructuras.Nodo();
+                nodo.Frecuencia = nodos.Value;
+                nodo.Valor = nodos.Key;
+                ListaNodos.Add(nodo);
+                ListaNodos.Sort((x, y) => x.CompareTo(y));
+            }
+            CrearArbol(ListaNodos, nombreArchivo, lineas, pathHuffman);
+            return 1;
         }
 
         public void CrearArbol(List<Estructuras.Nodo> ListNodos, string[] nombreArchivo, string[] lineas, string pathHuffman)
@@ -106,12 +105,10 @@ namespace Lab_1.Singleton
             Estructuras.ArbolS tree = new Estructuras.ArbolS();
             tree.raiz = ListNodos[0];
             ListNodos.Clear();
-            //Crear codigos prefijo y agregarlos a un diccionario de codigos prefijo de un archivo
             ObteniendoCodigoPrefijo(tree.raiz);
             NombreArchivos.Add(nombreArchivo[0]);
             CodigosPrefijo.Add(nombreArchivo[0], AuxCodigosPrefijo);
             codigo = "";
-            //Para crear archivo que contenga el codigo binario
             EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo, lineas, pathHuffman);
 
 
@@ -126,9 +123,11 @@ namespace Lab_1.Singleton
                 if (nodo.Valor != 'N')
                 {
                     ConcatenandoCodigoPrefijo(nodo);
-                    AuxCodigosPrefijo.Add(nodo.Valor, codigo);
+                    var val = (int)nodo.Valor;
+                    AuxCodigosPrefijo.Add(val, codigo);
                     codigo = "";
-                }else if (nodo.Valor == 'N' && nodo.izq == null && nodo.der == null)
+                }
+                else if (nodo.Valor == 'N' && nodo.izq == null && nodo.der == null)
                 {
                     ConcatenandoCodigoPrefijo(nodo);
                     AuxCodigosPrefijo.Add(nodo.Valor, codigo);
@@ -153,19 +152,7 @@ namespace Lab_1.Singleton
 
         }
 
-        public static string ValidateUtf8(char txt)
-        {
-            StringBuilder sbOutput = new StringBuilder();
-            char ch;
-                ch = txt;
-                if ((ch >= 0x0020 && ch <= 0xD7FF) ||(ch >= 0xE000 && ch <= 0xFFFD) ||ch == 0x0009 ||ch == 0x000A ||ch == 0x000D || ch == 0xD9F0)
-                {
-                    sbOutput.Append(ch);
-                }
-            return sbOutput.ToString();
-        }
-
-        public void EscrituraHuffman(string[] FileName, Dictionary<char, string> DiccionarioCP, string[] lineas, string pathHuffman)
+        public void EscrituraHuffman(string[] FileName, Dictionary<int, string> DiccionarioCP, string[] lineas, string pathHuffman)
         {
             var Text = new List<char>();
             var ListaAscii = new List<string>();
@@ -197,66 +184,126 @@ namespace Lab_1.Singleton
                 }
             }
 
-            var TextoComprimido = "";
-            foreach (var item in ListaAscii)
-            {
-                var ascii = Convert.ToChar(Convert.ToByte(item));
-                var utf8Text = ValidateUtf8(ascii);
-                TextoComprimido = $"{TextoComprimido}{utf8Text}";
-            }
-
-            var answer = "";
-
             var DicAux = CodigosPrefijo[FileName[0]];
-
-            foreach (var codigo in DicAux)
-            {
-                answer = $"{answer}{codigo.Key}|{codigo.Value}|";
-            }
-
 
             using (StreamWriter archivo = new StreamWriter($"{pathHuffman}//{FileName[0]}.huff"))
             {
                 archivo.WriteLine(FileName[1]);
-                archivo.WriteLine(answer);
-                archivo.WriteLine(TextoComprimido);
+                foreach (var codigo in DicAux)
+                {
+                    archivo.Write($"{codigo.Key}|{codigo.Value}|");
+                }
+                archivo.WriteLine();
+                archivo.WriteLine("-");
+
+                foreach (var item in ListaAscii)
+                {
+                    var ascii = Convert.ToChar(Convert.ToByte(item));
+                    archivo.Write($"{ascii}");
+                }
             }
             AuxCodigosPrefijo.Clear();
         }
 
-
         public int Descompresion(string path, string nombreArchivo, string pathHuffman)
         {
+            List<string> BinaryList = new List<string>();
             try
             {
                 var lineas = File.ReadAllLines(path);
-                var cont = 0;
-
-                foreach (var item in lineas)
+                var indexseparador = 0;
+                var extension = lineas[0];
+                for (int i = 0; i < lineas.Length; i++)
                 {
-                    if (cont == 0)
+                    if (lineas[i] == "-")
                     {
-                        var CP = item.Split('|');
-                        for (int i = 0; i < CP.Length; i++)
-                        {
-                            DescompCodigosPrefijo.Add(CP[i + 1], CP[i]);
-                        }
+                        break;
                     }
                     else
                     {
-                        //CONVERTIR A BINARIO CADA CARACTER
-                        //CONCATENAR CADA CARACTER Y VALIDAR QUE SEA MENOR A 8
-                        //ANALIZAR EN GRUPO DE 8 SI EXISTE CODIGO PREFIJO
-                        //ESCRIBIR CARACTER POR CODIGO PREFIJO
+                        indexseparador++;
                     }
                 }
+
+                for (int k = 1; k < indexseparador; k++)
+                {
+                    var separador = lineas[k].Split('|');
+                    for (int i = 0; i < separador.Length - 1; i += 2)
+                    {
+                    var separadordecimal = Convert.ToInt32(separador[i]);
+                        CodigoPD.Add(separador[i + 1], (char)separadordecimal);
+                    }
+                }
+
+                for (int i = indexseparador + 1; i < lineas.Length; i++)
+                {
+                    if (lineas[i].Length > 0)
+                    {
+                        var asciiArray = lineas[i].ToCharArray();
+
+                        for (int j = 0; j < asciiArray.Length; j++)
+                        {
+                            var BinaryCode = Convert.ToString(asciiArray[j], 2).PadLeft(8, '0');
+                            BinaryList.Add(BinaryCode);
+                        }
+                    }
+                }
+                ObtenerCaracter(BinaryList, CodigoPD, pathHuffman, nombreArchivo, extension);
+
                 return 1;
-            }
+        }
             catch
             {
                 return 0;
             }
-
         }
+
+        static int CountOfBytes = 0;
+        static string BinaryC = "";
+        static int PosicionLinea = 0;
+        public void ObtenerCaracter(List<string> BinaryList, Dictionary<string, char> CodigoPD, string pathHuffman, string nombreArchivo, string extension)
+        {
+            using (StreamWriter archivo = new StreamWriter($"{pathHuffman}//{nombreArchivo}.{extension}"))
+            {
+            
+                var CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
+            reinicio:
+                do
+                {
+                    BinaryC = $"{BinaryC}{CharOfBytes[CountOfBytes]}";
+                    CountOfBytes++;
+                    
+                    RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref BinaryC, nombreArchivo, extension);
+                    if (TextoDescomprimido.Length == 10)
+                    {
+                        archivo.Write(TextoDescomprimido);
+                        TextoDescomprimido = string.Empty;
+                        archivo.Flush();
+                    }
+                } while (CountOfBytes < CharOfBytes.Length);
+
+                PosicionLinea++;
+                CountOfBytes = 0;
+                if(BinaryList.Count > PosicionLinea)
+                {
+                    CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
+                    goto reinicio;
+                }
+            }
+
+
+        
+        }
+
+        static string TextoDescomprimido = "";
+        public void RecorrerBinaryListRecursivamente(List<string> BinaryList, Dictionary<string, char> CodigoPD, ref string BinaryC, string nombreArchivo, string extension)
+        {
+            if (CodigoPD.ContainsKey(BinaryC))
+            {
+                TextoDescomprimido = $"{TextoDescomprimido}{CodigoPD[BinaryC]}";
+                BinaryC = string.Empty;
+            }
+        }
+        
     }
 }
