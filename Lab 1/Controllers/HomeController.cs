@@ -26,8 +26,8 @@ namespace Lab_1.Controllers
             var nombre = nombreArchivo.Split('.');
             nombreArchivo = nombre[0];
             var PesoOriginal = Convert.ToDouble(file.ContentLength);
-            //try
-            //{
+            try
+            {
                 if (file != null && file.ContentLength > 0)
                 {
                     string model = "";
@@ -64,13 +64,13 @@ namespace Lab_1.Controllers
                     ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
                     return View();
                 }
-            //}
-            //catch
-            //{
-            //    ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
-            //    return View();
-            //}
         }
+            catch
+            {
+                ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+                return View();
+    }
+}
 
         public ActionResult CargaParaDescomprimir()
         {
