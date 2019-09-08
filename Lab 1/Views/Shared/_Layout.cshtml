@@ -16,6 +16,8 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar" ></span>
                 </button>
                 @Html.ActionLink("HUFFMAN", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
@@ -24,6 +26,8 @@
                     <li>@Html.ActionLink("Inicio", "Index", "Home")</li>
                     <li>@Html.ActionLink("Compresión", "CargaParaComprimir", "Home")</li>
                     <li>@Html.ActionLink("Descompresión", "CargaParaDescomprimir", "Home")</li>
+                    <li>@Html.ActionLink("Datos de compresion", "ListaArchivos", "Home")</li>
+                    <li>@Html.ActionLink("DescargarArchivos", "MostrarOpciones", "Home", new { } )</li>
                 </ul>
             </div>
         </div>
@@ -32,7 +36,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - Mi aplicación ASP.NET</p>
+            <p>&copy; @DateTime.Now.Year - Laboratorio #01 - Compresion de datos</p>
         </footer>
     </div>
 

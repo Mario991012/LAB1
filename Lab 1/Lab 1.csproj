@@ -165,6 +165,8 @@
     <Content Include="Views\Home\ListaArchivos.cshtml" />
     <Content Include="Views\Home\CargaParaComprimir.cshtml" />
     <Content Include="Views\Home\CargaParaDescomprimir.cshtml" />
+    <Content Include="Views\Home\Download.cshtml" />
+    <Content Include="Views\Home\MostrarListaEscogida.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

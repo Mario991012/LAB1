@@ -9,7 +9,7 @@ namespace Estructuras
     public class Nodo
     {
         public int Frecuencia { get; set; }
-        public char Valor { get; set; }
+        public byte Valor { get; set; }
         public Nodo izq { get; set; }
         public Nodo der { get; set; }
         public Nodo padre { get; set; }
@@ -24,7 +24,7 @@ namespace Estructuras
             padre = null;
             recorridoIzq = false;
             recorridoDer = false;
-            Valor = 'N';
+            Valor = Convert.ToByte('N');
         }
 
         public int CompareTo(object obj)
