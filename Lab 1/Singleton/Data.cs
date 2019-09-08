@@ -154,13 +154,13 @@ namespace Lab_1.Singleton
             ObteniendoCodigoPrefijo(tree.raiz);
             NombreArchivos.Add(nombreArchivo[0]);
             CodigosPrefijo.Add(nombreArchivo[0], AuxCodigosPrefijo);
-            codigo = "";
+            
             EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo, pathHuffman, path);
 
 
         }
 
-        static string codigo = "";
+        static string codigo;
         public void ObteniendoCodigoPrefijo(Estructuras.Nodo nodo)
         {
             if (nodo != null)
@@ -187,15 +187,14 @@ namespace Lab_1.Singleton
         {
             if (nodo.recorridoIzq == true)
             {
-                codigo = "0" + codigo;
+                codigo = $"0{codigo}";
                 ConcatenandoCodigoPrefijo(nodo.padre);
             }
             else if (nodo.recorridoDer == true)
             {
-                codigo = "1" + codigo;
+                codigo = $"1{codigo}";
                 ConcatenandoCodigoPrefijo(nodo.padre);
             }
-
         }
 
         public void EscrituraHuffman(string[] FileName, Dictionary<byte, string> DiccionarioCP, string pathHuffman, string path)
@@ -209,13 +208,14 @@ namespace Lab_1.Singleton
                         using (var writer = new BinaryWriter(writeStream))
                         {
                             var byteBuffer = new byte[bufferLength];
-                            //while (reader.BaseStream.Position != reader.BaseStream.Length)
-                            //{
+                            var Text = new List<char>();
+                            var ListaAscii = new List<byte>();
+                            var caracteres = new List<byte>();
+                            while (reader.BaseStream.Position != reader.BaseStream.Length)
+                            {
                                 byteBuffer = reader.ReadBytes(bufferLength);
 
-                                var Text = new List<char>();
-                                var ListaAscii = new List<string>();
-                                var caracteres = new List<byte>();
+                                
                                 foreach (var caracter in byteBuffer)
                                 {
                                     var codigoPrefijo = DiccionarioCP[caracter].ToCharArray();
@@ -226,37 +226,33 @@ namespace Lab_1.Singleton
                                         if (Text.Count >= 8)
                                         {
                                             var enlistado = "";
-                                            var ascii = 0;
+                                            byte ascii;
                                             foreach (var bin in Text)
                                             {
                                                 enlistado = $"{enlistado}{bin}";
                                             }
-                                            ascii = Convert.ToInt32(enlistado, 2);
-                                            ListaAscii.Add(ascii.ToString());
+                                            var decimalascii = Convert.ToInt32(enlistado, 2);
+                                            ascii = (byte)decimalascii;
+                                            ListaAscii.Add(ascii);
                                             Text.Clear();
                                         }
                                     }
                                 }
-                                var DicAux = CodigosPrefijo[FileName[0]];
-                                writer.Write(FileName[1]);
-                                writer.Write("\r");
-                                foreach (var codigo in DicAux)
-                                {
-                                    writer.Write($"{codigo.Key}|{codigo.Value}|");
-                                }
-                                writer.Write("\r");
-                                writer.Write("--");
-                                writer.Write("\r");
+                            }
 
-                                foreach (var item in ListaAscii)
-                                {
-                                    var ascii = Convert.ToChar(Convert.ToByte(item));
-                                    writer.Write($"{ascii}");
-                                }
-                                writer.Write("\r");
+                            var DicAux = CodigosPrefijo[FileName[0]];
+                            writer.Write(FileName[1]);
+                            foreach (var codigo in DicAux)
+                            {
+                                writer.Write($"{codigo.Key}|{codigo.Value}|");
+                            }
+                            writer.Write("--");
 
-                            //}
-
+                            foreach (var item in ListaAscii)
+                            {
+                                //var ascii = Convert.ToChar(Convert.ToByte(item));
+                                writer.Write(item);
+                            }
                         }
                     }
                 }
