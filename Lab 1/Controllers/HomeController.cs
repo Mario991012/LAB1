@@ -46,8 +46,8 @@ namespace Lab_1.Controllers
 
                     var Archivo = new Archivos();
                     Archivo.NombreArchivo = nombreArchivo;
-                    Archivo.Razon = ((double)((int)((PesoOriginal / PesoCompreso) * 1000.0))) / 1000.0;
-                    Archivo.Factor = ((double)((int)((PesoCompreso / PesoOriginal) * 1000.0))) / 1000.0;
+                    Archivo.Factor = ((double)((int)((PesoOriginal / PesoCompreso) * 1000.0))) / 1000.0;
+                    Archivo.Razon = ((double)((int)((PesoCompreso / PesoOriginal) * 1000.0))) / 1000.0;
                     Archivo.Porcentaje = (((double)((int)((1 - Convert.ToDouble(Archivo.Factor)) * 1000.0))) / 1000.0) * 100;
 
                     Data.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
