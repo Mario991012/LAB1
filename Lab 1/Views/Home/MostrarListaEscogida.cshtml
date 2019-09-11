@@ -3,22 +3,26 @@
     ViewBag.Title = "MostrarListaEscogida";
 }
 
-<h2>MostrarListaEscogida</h2>
-
-<table class="table">
-    <tr>
-        <th>Opciones</th>
-    </tr>
+<h2>Archivos Descargables</h2>
 
 
-    <tr class="table-dark">
-        <td>
-            @Html.ActionLink("Archivos Comprimidos", "MostrarListaEscogida", new { lista = 1 })
-        </td>
-        <td>
-            @Html.ActionLink("Archivos Descomprimidos", "MostrarListaEscogida", new { lista = 2 })
-        </td>
-    </tr>
+<div class="jumbotron">
+    <table class="table table-bordered table-responsive table-hover">
+        <tr>
+            <th>Opciones</th>
+            <th></th>
+        </tr>
 
 
-</table>
+        <tr class="table-hover">
+            <td>
+                @Html.ActionLink("Archivos Comprimidos", "MostrarListaEscogida", new { lista = 1 })
+            </td>
+            <td>
+                @Html.ActionLink("Archivos Descomprimidos", "MostrarListaEscogida", new { lista = 2 })
+            </td>
+        </tr>
+
+
+    </table>
+    </div>
