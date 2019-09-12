@@ -287,13 +287,14 @@ namespace Lab_1.Singleton
                     CountOfBytes++;
 
                     RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref BinaryC, nombreArchivo, extension);
-                    if (TextoDescomprimido.Count >= 10)
+                    if (TextoDescomprimido.Length >= 10)
                     {
-                        foreach(var letra in TextoDescomprimido)
-                        {
-                            archivo.Write(Convert.ToByte(letra));
-                        }
-                        TextoDescomprimido.Clear();
+                        
+                        var bytes = Encoding.Default.GetBytes(TextoDescomprimido);
+                        TextoDescomprimido = Encoding.UTF8.GetString(bytes);
+                        archivo.Write(TextoDescomprimido);
+                        
+                        TextoDescomprimido = string.Empty;
                         archivo.Flush();
                     }
                 } while (CountOfBytes < CharOfBytes.Length);
@@ -311,14 +312,14 @@ namespace Lab_1.Singleton
 
         }
 
-        static List<byte> TextoDescomprimido = new List<byte>();
+        static string TextoDescomprimido = "";
         public void RecorrerBinaryListRecursivamente(List<string> BinaryList, Dictionary<string, string> CodigoPD, ref string BinaryC, string nombreArchivo, string extension)
         {
             if (CodigoPD.ContainsKey(BinaryC))
             {
                 var dec = Convert.ToInt32(CodigoPD[BinaryC]);
-                var letra = Convert.ToByte(dec);
-                TextoDescomprimido.Add(letra);
+                var letra = Convert.ToChar(dec);
+                TextoDescomprimido=$"{TextoDescomprimido}{letra}";
                 BinaryC = string.Empty;
             }
         }
