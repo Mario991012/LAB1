@@ -29,77 +29,32 @@ namespace Lab_1.Controllers
             var nombre = nombreArchivo.Split('.');
             nombreArchivo = nombre[0];
             var PesoOriginal = Convert.ToDouble(file.ContentLength);
-            //try
-            //{
-            if (file != null && file.ContentLength > 0)
+            try
             {
-                var model = "";
-                model = Server.MapPath($"~/Archivos Originales/{nombre[0]}.{nombre[1]}");
-                var UbicacionHuffman = Server.MapPath("~//Archivos Comprimidos");
-                file.SaveAs(model);
-                if (Data.Instancia.Leer(model, nombre, UbicacionHuffman) == 1)
-                {
-                    var RutaArchivoCompreso = Server.MapPath($"~/Archivos Comprimidos/{nombreArchivo}.huff");
-
-                    var ArchivoCompreso = new FileInfo(RutaArchivoCompreso);
-                    var PesoCompreso = Convert.ToDouble(ArchivoCompreso.Length);
-
-                    var Archivo = new Archivos();
-                    Archivo.NombreArchivo = nombreArchivo;
-                    Archivo.Razon = ((double)((int)((PesoOriginal / PesoCompreso) * 1000.0))) / 1000.0;
-                    Archivo.Factor = ((double)((int)((PesoCompreso / PesoOriginal) * 1000.0))) / 1000.0;
-                    Archivo.Porcentaje = (((double)((int)((1 - Convert.ToDouble(Archivo.Factor)) * 1000.0))) / 1000.0) * 100;
-
-                    Data.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
-
-                    ViewBag.Msg = "Carga del archivo correcta";
-                    ViewBag.Mensaje = "Carga del archivo correcta";
-                    return RedirectToAction("ListaArchivos");
-                }
-                else
-                {
-                    ViewBag.Msg = "Carga del archivo incorrecta";
-                    return View();
-                }
-            }
-            else
-            {
-                ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
-                return View();
-            }
-        //}
-        //    catch
-        //    {
-        //        ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
-        //        return View(); 
-    //}
-}
-
-        public ActionResult CargaParaDescomprimir()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult CargaParaDescomprimir(HttpPostedFileBase file)
-        {
-            var nombreArchivo = file.FileName;
-            var nombre = nombreArchivo.Split('.');
-            //try
-            //{
                 if (file != null && file.ContentLength > 0)
                 {
-                    var model = Server.MapPath($"~/Archivos Comprimidos/{nombreArchivo}");
-
-                    var UbicacionDescomprimidos = Server.MapPath("~//Archivos Descomprimidos");
+                    var model = "";
+                    model = Server.MapPath($"~/Archivos Originales/{nombre[0]}.{nombre[1]}");
+                    var UbicacionHuffman = Server.MapPath("~//Archivos Comprimidos");
                     file.SaveAs(model);
-
-                    if (Data.Instancia.Descompresion(model, nombre[0], UbicacionDescomprimidos) == 1)
+                    if (Data.Instancia.Leer(model, nombre, UbicacionHuffman) == 1)
                     {
-                        var RutaArchivoDescompreso = Server.MapPath($"~/Archivos Descompresos/{nombre[0]}.huff");
+                        var RutaArchivoCompreso = Server.MapPath($"~/Archivos Comprimidos/{nombreArchivo}.huff");
+
+                        var ArchivoCompreso = new FileInfo(RutaArchivoCompreso);
+                        var PesoCompreso = Convert.ToDouble(ArchivoCompreso.Length);
+
+                        var Archivo = new Archivos();
+                        Archivo.NombreArchivo = nombreArchivo;
+                        Archivo.Factor = ((double)((int)((PesoOriginal / PesoCompreso) * 1000.0))) / 1000.0;
+                        Archivo.Razon = ((double)((int)((PesoCompreso / PesoOriginal) * 1000.0))) / 1000.0;
+                        Archivo.Porcentaje = (((double)((int)((1 - Convert.ToDouble(Archivo.Razon)) * 1000.0))) / 1000.0) * 100;
+
+                        Data.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
 
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
+                        ViewBag.MensajeDescarga = "Archivo comprimido descargable en apartado de descargas.";
                         return RedirectToAction("ListaArchivos");
                     }
                     else
@@ -113,12 +68,56 @@ namespace Lab_1.Controllers
                     ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
                     return View();
                 }
-            //}
-            //catch
-            //{
-            //    ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
-            //    return View();
-            //}
+            }
+            catch
+            {
+                ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+                return View();
+            }
+        }
+
+        public ActionResult CargaParaDescomprimir()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult CargaParaDescomprimir(HttpPostedFileBase file)
+        {
+            var nombreArchivo = file.FileName;
+            var nombre = nombreArchivo.Split('.');
+            try
+            {
+                if (file != null && file.ContentLength > 0)
+                {
+                    var model = Server.MapPath($"~/Archivos Comprimidos/{nombreArchivo}");
+
+                    var UbicacionDescomprimidos = Server.MapPath("~//Archivos Descomprimidos");
+                    file.SaveAs(model);
+
+                    if (Data.Instancia.Descompresion(model, nombre[0], UbicacionDescomprimidos) == 1)
+                    {
+                        ViewBag.Msg = "Carga del archivo correcta";
+                        ViewBag.Mensaje = "Carga del archivo correcta";
+                        return MostrarListaEscogida(2);
+                    }
+                    else
+                    {
+                        ViewBag.Msg = "Carga del archivo incorrecta";
+                        return View();
+                    }
+                }
+                else
+                {
+                    ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+                    return View();
+                }
+            }
+            catch
+            {
+                ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+                return View();
+            }
         }
 
         public ActionResult ListaArchivos()
@@ -167,7 +166,7 @@ namespace Lab_1.Controllers
                 {
                     ListC.Add(item.Name);
                 }
-                return View("Download",ListC);
+                return View("Download", ListC);
             }
             else if (lista == 2)
             {
@@ -180,7 +179,7 @@ namespace Lab_1.Controllers
                 {
                     list.Add(item.Name);
                 }
-                return View("Download",list);
+                return View("Download", list);
             }
             return View();
         }
@@ -204,7 +203,7 @@ namespace Lab_1.Controllers
             }
             catch
             {
-                return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);     
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.Forbidden);
             }
         }
     }
