@@ -22,17 +22,16 @@ namespace Lab_1.Singleton
 
         public Dictionary<string, Dictionary<byte, string>> CodigosPrefijo = new Dictionary<string, Dictionary<byte, string>>();
         public Estructuras.ArbolS Arbol = new Estructuras.ArbolS();
-        public Dictionary<byte, int> Frecuencias = new Dictionary<byte, int>();
-        public List<Estructuras.Nodo> ListaNodos = new List<Estructuras.Nodo>();
-        public Dictionary<byte, string> AuxCodigosPrefijo = new Dictionary<byte, string>();
-        public Dictionary<string, string> DescompCodigosPrefijo = new Dictionary<string, string>();
-        public List<string> NombreArchivos = new List<string>();
+        public Dictionary<byte, string> CodigosPrefijoArchivoActual = new Dictionary<byte, string>();
         public Dictionary<string, Archivos> DatosDeArchivos = new Dictionary<string, Archivos>();
         public Dictionary<string, string> CodigoPD = new Dictionary<string, string>();
-        const int bufferLength = 1000;
+        const int bufferLength = 2000;
 
         public int Leer(string path, string[] nombreArchivo, string pathHuffman)
         {
+            var ListaNodos = new List<Estructuras.Nodo>();
+            var Frecuencias = new Dictionary<byte, int>();
+
             using (var stream = new FileStream(path, FileMode.Open))
             {
                 using (var reader = new BinaryReader(stream))
@@ -74,8 +73,8 @@ namespace Lab_1.Singleton
             while (ListNodos.Count >= 2)
             {
                 Estructuras.Nodo padre = new Estructuras.Nodo();
-                ListaNodos[0].recorridoIzq = true;
-                ListaNodos[1].recorridoDer = true;
+                ListNodos[0].recorridoIzq = true;
+                ListNodos[1].recorridoDer = true;
                 padre.izq = ListNodos[0];
                 padre.der = ListNodos[1];
                 padre.Frecuencia = padre.izq.Frecuencia + padre.der.Frecuencia;
@@ -108,10 +107,9 @@ namespace Lab_1.Singleton
             tree.raiz = ListNodos[0];
             ListNodos.Clear();
             ObteniendoCodigoPrefijo(tree.raiz);
-            NombreArchivos.Add(nombreArchivo[0]);
-            CodigosPrefijo.Add(nombreArchivo[0], AuxCodigosPrefijo);
+            CodigosPrefijo.Add(nombreArchivo[0], CodigosPrefijoArchivoActual);
             
-            EscrituraHuffman(nombreArchivo, AuxCodigosPrefijo, pathHuffman, path);
+            EscribiendoHuffman(nombreArchivo, CodigosPrefijoArchivoActual, pathHuffman, path);
 
 
         }
@@ -126,13 +124,13 @@ namespace Lab_1.Singleton
                 {
                     ConcatenandoCodigoPrefijo(nodo);
                     var val = (byte)nodo.Valor;
-                    AuxCodigosPrefijo.Add(val, codigo);
+                    CodigosPrefijoArchivoActual.Add(val, codigo);
                     codigo = "";
                 }
                 else if (nodo.Valor == 'N' && nodo.izq == null && nodo.der == null)
                 {
                     ConcatenandoCodigoPrefijo(nodo);
-                    AuxCodigosPrefijo.Add(nodo.Valor, codigo);
+                    CodigosPrefijoArchivoActual.Add(nodo.Valor, codigo);
                     codigo = "";
                 }
                 ObteniendoCodigoPrefijo(nodo.der);
@@ -153,7 +151,7 @@ namespace Lab_1.Singleton
             }
         }
 
-        public void EscrituraHuffman(string[] FileName, Dictionary<byte, string> DiccionarioCP, string pathHuffman, string path)
+        public void EscribiendoHuffman(string[] FileName, Dictionary<byte, string> DiccionarioCP, string pathHuffman, string path)
         {
             using (var stream = new FileStream(path, FileMode.Open))
             {
@@ -171,7 +169,6 @@ namespace Lab_1.Singleton
                             {
                                 byteBuffer = reader.ReadBytes(bufferLength);
 
-                                
                                 foreach (var caracter in byteBuffer)
                                 {
                                     var codigoPrefijo = DiccionarioCP[caracter].ToCharArray();
@@ -206,22 +203,21 @@ namespace Lab_1.Singleton
 
                             foreach (var item in ListaAscii)
                             {
-                                //var ascii = Convert.ToChar(Convert.ToByte(item));
                                 writer.Write(item);
                             }
                         }
                     }
                 }
             }
-            AuxCodigosPrefijo.Clear();
+            CodigosPrefijoArchivoActual.Clear();
         }
 
         public int Descompresion(string path, string nombreArchivo, string pathHuffman)
         {
             List<string> BinaryList = new List<string>();
-            //try
-            //{
-            var extension = "";
+            try
+            {
+                var extension = "";
             var ContadorDeLecturas = 0;
             using (var stream = new FileStream(path, FileMode.Open))
             {
@@ -256,7 +252,6 @@ namespace Lab_1.Singleton
                             var BinaryCode = Convert.ToString(ByteLeido, 2).PadLeft(8, '0');
                             BinaryList.Add(BinaryCode);
                         }
-                        
                     }
                     ObtenerCaracter(BinaryList, CodigoPD, pathHuffman, nombreArchivo, extension);
                     CodigoPD.Clear();
@@ -264,11 +259,11 @@ namespace Lab_1.Singleton
             }
 
             return 1;
-            //}
-            //    catch
-            //    {
-            //        return 0;
-            //    }
+        }
+                catch
+                {
+                    return 0;
+                }
         }
 
         static int CountOfBytes = 0;
@@ -307,9 +302,6 @@ namespace Lab_1.Singleton
                     goto reinicio;
                 }
             }
-
-
-
         }
 
         static string TextoDescomprimido = "";

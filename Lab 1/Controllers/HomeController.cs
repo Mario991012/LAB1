@@ -54,6 +54,7 @@ namespace Lab_1.Controllers
 
                     ViewBag.Msg = "Carga del archivo correcta";
                     ViewBag.Mensaje = "Carga del archivo correcta";
+                    ViewBag.MensajeDescarga = "Archivo comprimido descargable en apartado de descargas.";
                     return RedirectToAction("ListaArchivos");
                 }
                 else
