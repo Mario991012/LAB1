@@ -212,7 +212,7 @@ namespace Lab_1.Singleton
             CodigosPrefijoArchivoActual.Clear();
         }
 
-        public int Descompresion(string path, string nombreArchivo, string pathHuffman)
+        public int Descompresion(string path, string[] nombreArchivo, string pathHuffman)
         {
             List<string> BinaryList = new List<string>();
             try
@@ -253,7 +253,7 @@ namespace Lab_1.Singleton
                                 BinaryList.Add(BinaryCode);
                             }
                         }
-                        ObtenerCaracter(BinaryList, CodigoPD, pathHuffman, nombreArchivo, extension);
+                        ObtenerCaracter(BinaryList, CodigoPD, pathHuffman, nombreArchivo, extension, path);
                         CodigoPD.Clear();
                     }
                 }
@@ -269,43 +269,46 @@ namespace Lab_1.Singleton
         static int CountOfBytes = 0;
         static string BinaryC = "";
         static int PosicionLinea = 0;
-        public void ObtenerCaracter(List<string> BinaryList, Dictionary<string, string> CodigoPD, string pathHuffman, string nombreArchivo, string extension)
+        public void ObtenerCaracter(List<string> BinaryList, Dictionary<string, string> CodigoPD, string pathHuffman, string[] nombreArchivo, string extension, string path)
         {
-            using (StreamWriter archivo = new StreamWriter($"{pathHuffman}//{nombreArchivo}.{extension}"))
+
+            using (var writeStream = new FileStream($"{pathHuffman}/{nombreArchivo[0]}.{extension}", FileMode.OpenOrCreate))
             {
-
-                var CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
+                using (var writer = new BinaryWriter(writeStream))
+                {
+                    var CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
                 reinicio:
-                do
-                {
-                    BinaryC = $"{BinaryC}{CharOfBytes[CountOfBytes]}";
-                    CountOfBytes++;
-
-                    RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref BinaryC, nombreArchivo, extension);
-                    if (TextoDescomprimido.Length >= 10)
+                    do
                     {
+                        BinaryC = $"{BinaryC}{CharOfBytes[CountOfBytes]}";
+                        CountOfBytes++;
 
-                        var bytes = Encoding.Default.GetBytes(TextoDescomprimido);
-                        TextoDescomprimido = Encoding.UTF8.GetString(bytes);
-                        archivo.Write(TextoDescomprimido);
+                        RecorrerBinaryListRecursivamente(CodigoPD, ref BinaryC);
+                        if (TextoDescomprimido.Length >= 1000)
+                        {
 
-                        TextoDescomprimido = string.Empty;
-                        archivo.Flush();
+                            var bytes = Encoding.GetEncoding("ISO-8859-15").GetBytes(TextoDescomprimido);
+
+                            writer.Write(bytes);
+
+                            TextoDescomprimido = string.Empty;
+                            writer.Flush();
+                        }
+                    } while (CountOfBytes < CharOfBytes.Length);
+
+                    PosicionLinea++;
+                    CountOfBytes = 0;
+                    if (BinaryList.Count > PosicionLinea)
+                    {
+                        CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
+                        goto reinicio;
                     }
-                } while (CountOfBytes < CharOfBytes.Length);
-
-                PosicionLinea++;
-                CountOfBytes = 0;
-                if (BinaryList.Count > PosicionLinea)
-                {
-                    CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
-                    goto reinicio;
                 }
             }
         }
 
         static string TextoDescomprimido = "";
-        public void RecorrerBinaryListRecursivamente(List<string> BinaryList, Dictionary<string, string> CodigoPD, ref string BinaryC, string nombreArchivo, string extension)
+        public void RecorrerBinaryListRecursivamente(Dictionary<string, string> CodigoPD, ref string BinaryC)
         {
             if (CodigoPD.ContainsKey(BinaryC))
             {
