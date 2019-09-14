@@ -25,7 +25,7 @@ namespace Lab_1.Singleton
         public Dictionary<byte, string> CodigosPrefijoArchivoActual = new Dictionary<byte, string>();
         public Dictionary<string, Archivos> DatosDeArchivos = new Dictionary<string, Archivos>();
         public Dictionary<string, string> CodigoPD = new Dictionary<string, string>();
-        const int bufferLength = 2000;
+        const int bufferLength = 1000;
 
         public int Leer(string path, string[] nombreArchivo, string pathHuffman)
         {
@@ -271,28 +271,24 @@ namespace Lab_1.Singleton
         static int PosicionLinea = 0;
         public void ObtenerCaracter(List<string> BinaryList, Dictionary<string, string> CodigoPD, string pathHuffman, string[] nombreArchivo, string extension, string path)
         {
-
-            using (var writeStream = new FileStream($"{pathHuffman}/{nombreArchivo[0]}.{extension}", FileMode.OpenOrCreate))
+            using (var stream = new FileStream($"{pathHuffman}//{nombreArchivo[0]}.{extension}", FileMode.OpenOrCreate))
             {
-                using (var writer = new BinaryWriter(writeStream))
+                using (var archivo = new BinaryWriter(stream))
                 {
+
                     var CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
                 reinicio:
                     do
                     {
                         BinaryC = $"{BinaryC}{CharOfBytes[CountOfBytes]}";
                         CountOfBytes++;
-
                         RecorrerBinaryListRecursivamente(CodigoPD, ref BinaryC);
-                        if (TextoDescomprimido.Length >= 1000)
+                        if (TextoDescomprimido.Length > 0)
                         {
-
-                            var bytes = Encoding.GetEncoding("ISO-8859-15").GetBytes(TextoDescomprimido);
-
-                            writer.Write(bytes);
-
+                            var bytes = Encoding.GetEncoding("Windows-1252").GetBytes(TextoDescomprimido);
+                            archivo.Write(bytes);
                             TextoDescomprimido = string.Empty;
-                            writer.Flush();
+                            archivo.Flush();
                         }
                     } while (CountOfBytes < CharOfBytes.Length);
 
@@ -305,8 +301,8 @@ namespace Lab_1.Singleton
                     }
                 }
             }
-        }
 
+        }
         static string TextoDescomprimido = "";
         public void RecorrerBinaryListRecursivamente(Dictionary<string, string> CodigoPD, ref string BinaryC)
         {
