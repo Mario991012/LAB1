@@ -95,7 +95,7 @@ namespace Lab_1.Controllers
                     var UbicacionDescomprimidos = Server.MapPath("~//Archivos Descomprimidos");
                     file.SaveAs(model);
 
-                    if (Data.Instancia.Descompresion(model, nombre[0], UbicacionDescomprimidos) == 1)
+                    if (Data.Instancia.Descompresion(model, nombre, UbicacionDescomprimidos) == 1)
                     {
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
