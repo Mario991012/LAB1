@@ -271,37 +271,41 @@ namespace Lab_1.Singleton
         static int PosicionLinea = 0;
         public void ObtenerCaracter(List<string> BinaryList, Dictionary<string, string> CodigoPD, string pathHuffman, string nombreArchivo, string extension)
         {
-            using (StreamWriter archivo = new StreamWriter($"{pathHuffman}//{nombreArchivo}.{extension}"))
+            using (var stream = new FileStream($"{pathHuffman}//{nombreArchivo}.{extension}", FileMode.OpenOrCreate))
             {
+                using (var archivo = new BinaryWriter(stream))
+                {
 
-                var CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
+                    var CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
                 reinicio:
-                do
-                {
-                    BinaryC = $"{BinaryC}{CharOfBytes[CountOfBytes]}";
-                    CountOfBytes++;
-
-                    RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref BinaryC, nombreArchivo, extension);
-                    if (TextoDescomprimido.Length >= 10)
+                    do
                     {
-                        
-                        var bytes = Encoding.Default.GetBytes(TextoDescomprimido);
-                        TextoDescomprimido = Encoding.UTF8.GetString(bytes);
-                        archivo.Write(TextoDescomprimido);
-                        
-                        TextoDescomprimido = string.Empty;
-                        archivo.Flush();
-                    }
-                } while (CountOfBytes < CharOfBytes.Length);
+                        BinaryC = $"{BinaryC}{CharOfBytes[CountOfBytes]}";
+                        CountOfBytes++;
 
-                PosicionLinea++;
-                CountOfBytes = 0;
-                if (BinaryList.Count > PosicionLinea)
-                {
-                    CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
-                    goto reinicio;
+                        RecorrerBinaryListRecursivamente(BinaryList, CodigoPD, ref BinaryC, nombreArchivo, extension);
+                        if (TextoDescomprimido.Length >= 10)
+                        {
+
+                            var bytes = Encoding.Default.GetBytes(TextoDescomprimido);
+                            TextoDescomprimido = Encoding.ASCII.GetString(bytes);
+                            archivo.Write(TextoDescomprimido);
+
+                            TextoDescomprimido = string.Empty;
+                            archivo.Flush();
+                        }
+                    } while (CountOfBytes < CharOfBytes.Length);
+
+                    PosicionLinea++;
+                    CountOfBytes = 0;
+                    if (BinaryList.Count > PosicionLinea)
+                    {
+                        CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
+                        goto reinicio;
+                    }
                 }
             }
+            
         }
 
         static string TextoDescomprimido = "";
