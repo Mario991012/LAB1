@@ -1,0 +1,26 @@
+﻿
+@{
+    ViewBag.Title = "MenuPrincipal";
+}
+
+<h2>MenuPrincipal</h2>
+
+
+<div class="jumbotron">
+    <table class="table table-bordered table-responsive table-hover">
+        <tr>
+            <th>Escoga Metodo de compresion</th>
+            <th></th>
+        </tr>
+
+        <tr class="table-hover">
+            <td>
+                @Html.ActionLink("Compresion Huffman", "EscogerCompresion", new { metodo = 1 })
+            </td>
+            <td>
+                @Html.ActionLink("Compresion LZW", "EscogerCompresion", new { metodo = 2 })
+            </td>
+        </tr>
+
+    </table>
+</div>

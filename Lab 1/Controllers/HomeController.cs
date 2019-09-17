@@ -12,6 +12,26 @@ namespace Lab_1.Controllers
     {
         public string GetContentTyoe { get; private set; }
 
+        public ViewResult MenuPrincipal()
+        {
+            return View();
+        }
+
+        public ActionResult EscogerCompresion(int metodo)
+        {
+            if (metodo == 1)
+            {
+                return View("Index");
+            }
+            else if (metodo == 2)
+            {
+                return RedirectToAction("MenuLZW", "LZW");
+            }
+            
+            return View("MenuPrincipal");
+            
+        }
+
         public ActionResult Index()
         {
             return View();
