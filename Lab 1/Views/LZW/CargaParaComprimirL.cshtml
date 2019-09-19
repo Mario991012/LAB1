@@ -6,10 +6,10 @@
 <h2>CARGA DE ARCHIVO LZW</h2>
 
 <div class="jumbotron">
-    <h2 class="display-3"> HUFFMAN: Carga de archivo a comprimir</h2>
-    <h4 class="display-3"> Comprima su archivo en uno extension .huff</h4>
+    <h2 class="display-3"> LZW: Carga de archivo a comprimir</h2>
+    <h4 class="display-3"> Comprima su archivo en uno extension .LZW</h4>
     <p class="lead">
-        @using (Html.BeginForm("CargaParaComprimir", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        @using (Html.BeginForm("CargaParaComprimirL", "LZW", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
         <p>SUBE EL ARCHIVO </p>
         <input type="file" name="file" />

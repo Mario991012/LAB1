@@ -17,6 +17,11 @@ namespace Lab_1.Controllers
             return View();
         }
 
+        public ActionResult CargaParaComprimirL()
+        {
+            return View("CargaParaComprimirL");
+        }
+
         [HttpPost]
         public ActionResult CargaParaComprimirL(HttpPostedFileBase file)
         {
@@ -44,12 +49,12 @@ namespace Lab_1.Controllers
                         Archivo.Razon = ((double)((int)((PesoCompreso / OriginalPeso) * 1000.0))) / 1000.0;
                         Archivo.Porcentaje = (((double)((int)((1 - Convert.ToDouble(Archivo.Razon)) * 1000.0))) / 1000.0) * 100;
 
-                        LogicaLZW.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
+                        //LogicaLZW.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
 
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
                         ViewBag.MensajeDescarga = "Archivo comprimido descargable en apartado de descargas.";
-                        return RedirectToAction("ListaArchivos");
+                        return RedirectToAction("ListaArchivos", "Home");
                     }
                     else
                     {
@@ -68,7 +73,6 @@ namespace Lab_1.Controllers
                 ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
                 return View();
             }
-            return View();
         }
 
         [HttpPost]
