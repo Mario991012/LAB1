@@ -49,15 +49,15 @@ namespace Lab_1.Controllers
             var nombre = nombreArchivo.Split('.');
             nombreArchivo = nombre[0];
             var PesoOriginal = Convert.ToDouble(file.ContentLength);
-            try
-            {
+            //try
+            //{
                 if (file != null && file.ContentLength > 0)
                 {
                     var model = "";
                     model = Server.MapPath($"~/Archivos Originales/{nombre[0]}.{nombre[1]}");
                     var UbicacionHuffman = Server.MapPath("~//Archivos Comprimidos");
                     file.SaveAs(model);
-                    if (Data.Instancia.Leer(model, nombre, UbicacionHuffman) == 1)
+                    if (Data.Instancia.CompresiónHuffman(model, nombre, UbicacionHuffman) == 1)
                     {
                         var RutaArchivoCompreso = Server.MapPath($"~/Archivos Comprimidos/{nombreArchivo}.huff");
 
@@ -88,12 +88,12 @@ namespace Lab_1.Controllers
                     ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
                     return View();
                 }
-            }
-            catch
-            {
-                ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
-                return View();
-            }
+            //}
+            //catch
+            //{
+            //    ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+            //    return View();
+            //}
         }
 
         public ActionResult CargaParaDescomprimir()

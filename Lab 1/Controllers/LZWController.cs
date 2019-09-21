@@ -38,7 +38,7 @@ namespace Lab_1.Controllers
                     file.SaveAs(model);
                     if (LogicaLZW.Instancia.LecturaArchivo(model, NombreArray, UbicacionAAlmacenarLZW) == 1)
                     {
-                        var RutaArchivoCompreso = Server.MapPath($"~/Archivos Comprimidos LZW/{nombreDocumento}.huff");
+                        var RutaArchivoCompreso = Server.MapPath($"~/Archivos Comprimidos LZW/{nombreDocumento}.LZW");
 
                         var ArchivoCompreso = new FileInfo(RutaArchivoCompreso);
                         var PesoCompreso = Convert.ToDouble(ArchivoCompreso.Length);
@@ -49,7 +49,7 @@ namespace Lab_1.Controllers
                         Archivo.Razon = ((double)((int)((PesoCompreso / OriginalPeso) * 1000.0))) / 1000.0;
                         Archivo.Porcentaje = (((double)((int)((1 - Convert.ToDouble(Archivo.Razon)) * 1000.0))) / 1000.0) * 100;
 
-                        //LogicaLZW.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
+                        Data.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
 
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";

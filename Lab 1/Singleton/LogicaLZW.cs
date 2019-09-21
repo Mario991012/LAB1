@@ -34,23 +34,25 @@ namespace Lab_1.Singleton
 
         public Dictionary<string, int> CreacionDiccionario(string RutaOriginal, string[] NombreArchivo, string UbicacionAAlmacenarLZW)
         {
-            var DiccionarioAux = new Dictionary<string, int>();
-            var DiccionarioParaLlaves = new Dictionary<string, int>();
+            var limiteCaracteresUnicos = 0;
+            var DiccionarioLZW = new Dictionary<string, int>();
+            var contadorLlaves = 1;
             using (var stream = new FileStream(RutaOriginal, FileMode.Open))
             {
                 using (var reader = new BinaryReader(stream))
                 {
                     var byteBuffer = new byte[bufferLength];
-                    var contadorLlaves = 1;
-                    //Para caracteres solos
+                    
+
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
                         byteBuffer = reader.ReadBytes(bufferLength);
                         for (int i = 0; i < byteBuffer.Length; i++)
                         {
-                            if (DiccionarioAux.ContainsKey(Convert.ToString(Convert.ToChar(byteBuffer[i]))) == false)
+                            if (DiccionarioLZW.ContainsKey(Convert.ToString(Convert.ToChar(byteBuffer[i]))) == false)
                             {
-                                DiccionarioAux.Add(Convert.ToString(Convert.ToChar(byteBuffer[i])), contadorLlaves);
+                                DiccionarioLZW.Add(Convert.ToString(Convert.ToChar(byteBuffer[i])), contadorLlaves);
+                                limiteCaracteresUnicos++;
                                 contadorLlaves++;
                             }
 
@@ -59,53 +61,86 @@ namespace Lab_1.Singleton
                 }
             }
 
-                    DiccionarioParaLlaves = DiccionarioAux;
-                    var LlaveAux = string.Empty;
-                    var LlaveConcatenada = string.Empty;
-                    var TextoAEscribir = string.Empty;
-                    var indicadorPosicion = 0;
+            var LlaveAux = string.Empty;
+
             using (var stream = new FileStream(RutaOriginal, FileMode.Open))
             {
                 using (var reader = new BinaryReader(stream))
                 {
-                    var byteBuffer = new byte[bufferLength];
-                    //Para juntar caracteres y codificar mensaje
-                    while (reader.BaseStream.Position != reader.BaseStream.Length)
+                    using (var streamWriter = new FileStream($"{UbicacionAAlmacenarLZW}/{NombreArchivo[0]}.LZW", FileMode.OpenOrCreate))
                     {
-                        byteBuffer = reader.ReadBytes(bufferLength);
-                        for (int i = 0; i < byteBuffer.Length; i++)
+                        using (var writer = new BinaryWriter(streamWriter))
                         {
-                            if ((DiccionarioParaLlaves.ContainsKey(Convert.ToString(Convert.ToChar(byteBuffer[i]))) == true) &&(i < reader.BaseStream.Length-1))
+                            var byteBuffer = new byte[bufferLength];
+                            //Para juntar caracteres y codificar mensaje
+                            writer.Write(NombreArchivo[1]);
+                            foreach (var item in DiccionarioLZW)
                             {
-                                LlaveAux = Convert.ToString(Convert.ToChar(byteBuffer[i]));
-                                indicadorPosicion = i;
-                                ConcatenarLlaves(ref DiccionarioParaLlaves, ref LlaveAux, byteBuffer, i);
-                                i += j;
-                                j = 0;
+                                writer.Write($"{item.Key}|{item.Value}");
                             }
+                            writer.Write("--");
+                            var j = 0;
+                            while (reader.BaseStream.Position != reader.BaseStream.Length)
+                            {
+                                var PosibleLlave = string.Empty;
+                                byteBuffer = reader.ReadBytes(bufferLength);
+                                for (int i = 0; i < byteBuffer.Length; i++)
+                                {
+                                    LlaveAux = Convert.ToString(Convert.ToChar(byteBuffer[i]));
+                                    PosibleLlave = LlaveAux;
+                                reinicio:
+                                    if (DiccionarioLZW.ContainsKey(PosibleLlave) && (i < reader.BaseStream.Length - 1))
+                                    {
+                                        var next = Convert.ToChar(byteBuffer[i + 1]);
+                                        PosibleLlave = $"{PosibleLlave}{next}";
+                                        j++;
+                                        i += j - 1;
+                                        goto reinicio;
+                                    }
+                                    else
+                                    {
+                                        DiccionarioLZW.Add(PosibleLlave, contadorLlaves);
+                                        contadorLlaves++;
+                                        
+                                        i += j - 1;
+                                        j = 0;
+                                        var ByteEscrito = Convert.ToByte(DiccionarioLZW[LlaveAux]);
+                                        writer.Write(DiccionarioLZW[LlaveAux]);
+                                    }
 
-                        }
-                    }
+                                }
+                            }
+                }
+            }
                 }
             }
              
-            return DiccionarioParaLlaves;
+            return DiccionarioLZW;
         }
 
         static int j = 0;
-        public void ConcatenarLlaves(ref Dictionary<string, int> DiccionarioParaLlaves, ref string LlaveAux, byte[] byteBuffer, int i)
+        public void ConcatenarLlaves(ref Dictionary<string, int> DiccionarioParaLlaves, ref string LlaveAux, byte[] byteBuffer, int i, long ultimaposicion, string UbicacionAAlmacenarLZW)
         {
-            var next = Convert.ToChar(byteBuffer[i + 1]);
-            var PosibleLlave = $"{LlaveAux}{next}";
-            if (DiccionarioParaLlaves.ContainsKey(PosibleLlave) == false)
+            using (var streamWriter = new FileStream(UbicacionAAlmacenarLZW, FileMode.OpenOrCreate))
             {
+                using (var writer = new BinaryWriter(streamWriter))
+                {
+                    bucle:
+                    var next = Convert.ToChar(byteBuffer[i + 1]);
+                    var PosibleLlave = $"{LlaveAux}{next}";
+                    if (DiccionarioParaLlaves.ContainsKey(PosibleLlave) && (i < ultimaposicion - 1))
+                    {
+                        ConcatenarLlaves(ref DiccionarioParaLlaves, ref PosibleLlave, byteBuffer, i + 1, ultimaposicion, UbicacionAAlmacenarLZW);
 
-                DiccionarioParaLlaves.Add(PosibleLlave, DiccionarioParaLlaves.Count+1);
-            }
-            else
-            {
-                ConcatenarLlaves(ref DiccionarioParaLlaves, ref PosibleLlave, byteBuffer, i+1);
-                j++;
+                        j++;
+
+                    }
+                    else
+                    {
+                        DiccionarioParaLlaves.Add(PosibleLlave, DiccionarioParaLlaves.Count + 1);
+                        goto bucle;
+                    }
+                }
             }
         }
     }
