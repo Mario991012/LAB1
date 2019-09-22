@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.IO;
+using System.Linq;
 
 namespace Lab_1.Singleton
 {
@@ -26,122 +25,178 @@ namespace Lab_1.Singleton
 
         const int bufferLength = 1000;
 
-        public int LecturaArchivo(string RutaOriginal, string[] NombreArchivo, string UbicacionAAlmacenarLZW)
+        public int Comprimir(string RutaOriginal, string[] NombreArchivo, string UbicacionAAlmacenarLZW)
         {
-            CaracteresDelArchivo = CreacionDiccionario(RutaOriginal, NombreArchivo, UbicacionAAlmacenarLZW);//Este se tiene que escribir
-            return 1;
-        }
-
-        public Dictionary<string, int> CreacionDiccionario(string RutaOriginal, string[] NombreArchivo, string UbicacionAAlmacenarLZW)
-        {
-            var limiteCaracteresUnicos = 0;
-            var DiccionarioLZW = new Dictionary<string, int>();
-            var contadorLlaves = 1;
+            var caracteres = new Dictionary<string, int>();
+            var indice = 1;
             using (var stream = new FileStream(RutaOriginal, FileMode.Open))
             {
                 using (var reader = new BinaryReader(stream))
                 {
                     var byteBuffer = new byte[bufferLength];
-                    
 
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
                         byteBuffer = reader.ReadBytes(bufferLength);
                         for (int i = 0; i < byteBuffer.Length; i++)
                         {
-                            if (DiccionarioLZW.ContainsKey(Convert.ToString(Convert.ToChar(byteBuffer[i]))) == false)
+                            if (!caracteres.ContainsKey(Convert.ToString(Convert.ToChar(byteBuffer[i]))))
                             {
-                                DiccionarioLZW.Add(Convert.ToString(Convert.ToChar(byteBuffer[i])), contadorLlaves);
-                                limiteCaracteresUnicos++;
-                                contadorLlaves++;
+                                caracteres.Add(Convert.ToString(Convert.ToChar(byteBuffer[i])), indice);
+                                indice++;
                             }
-
                         }
                     }
                 }
             }
 
-            var LlaveAux = string.Empty;
+            
 
             using (var stream = new FileStream(RutaOriginal, FileMode.Open))
             {
                 using (var reader = new BinaryReader(stream))
                 {
-                    using (var streamWriter = new FileStream($"{UbicacionAAlmacenarLZW}/{NombreArchivo[0]}.LZW", FileMode.OpenOrCreate))
+                    using (var streamWriter = new FileStream($"{UbicacionAAlmacenarLZW}/{NombreArchivo[0]}.lzw", FileMode.OpenOrCreate))
                     {
                         using (var writer = new BinaryWriter(streamWriter))
                         {
-                            var byteBuffer = new byte[bufferLength];
-                            //Para juntar caracteres y codificar mensaje
                             writer.Write(NombreArchivo[1]);
-                            foreach (var item in DiccionarioLZW)
+
+                            foreach(var caracter in caracteres)
                             {
-                                writer.Write($"{item.Key}|{item.Value}");
+                                writer.Write($"{caracter.Value}|{caracter.Key}");
                             }
                             writer.Write("--");
-                            var j = 0;
+                            var byteBuffer = new byte[bufferLength];
+                            var PosibleLlave = string.Empty;
+                            var posicionesALaDerecha = 0;
+
                             while (reader.BaseStream.Position != reader.BaseStream.Length)
                             {
-                                var PosibleLlave = string.Empty;
                                 byteBuffer = reader.ReadBytes(bufferLength);
                                 for (int i = 0; i < byteBuffer.Length; i++)
                                 {
-                                    LlaveAux = Convert.ToString(Convert.ToChar(byteBuffer[i]));
-                                    PosibleLlave = LlaveAux;
-                                reinicio:
-                                    if (DiccionarioLZW.ContainsKey(PosibleLlave) && (i < reader.BaseStream.Length - 1))
+                                    PosibleLlave = Convert.ToString(Convert.ToChar(byteBuffer[i]));
+
+                                    while (caracteres.ContainsKey(PosibleLlave) && i + 1 < byteBuffer.Length)
                                     {
-                                        var next = Convert.ToChar(byteBuffer[i + 1]);
-                                        PosibleLlave = $"{PosibleLlave}{next}";
-                                        j++;
-                                        i += j - 1;
-                                        goto reinicio;
+                                        posicionesALaDerecha++;
+                                        PosibleLlave = $"{PosibleLlave}{Convert.ToString(Convert.ToChar(byteBuffer[i + posicionesALaDerecha]))}";
                                     }
-                                    else
+
+                                    if (i + 1 >= byteBuffer.Length)
                                     {
-                                        DiccionarioLZW.Add(PosibleLlave, contadorLlaves);
-                                        contadorLlaves++;
-                                        
-                                        i += j - 1;
-                                        j = 0;
-                                        var ByteEscrito = Convert.ToByte(DiccionarioLZW[LlaveAux]);
-                                        writer.Write(DiccionarioLZW[LlaveAux]);
+                                        writer.Write(Convert.ToByte(caracteres[PosibleLlave]));
+                                    }else
+                                    {
+                                        caracteres.Add(PosibleLlave, indice);
+                                        indice++;
+                                        i += posicionesALaDerecha - 1;
+                                        posicionesALaDerecha = 0;
+                                        var escrito = PosibleLlave.Substring(0, PosibleLlave.Length - 1);
+                                        var write = Convert.ToByte(caracteres[escrito]);
+                                        writer.Write(write);
                                     }
+
+                                    
 
                                 }
                             }
+                        }
+                    }
                 }
             }
-                }
-            }
-             
-            return DiccionarioLZW;
+
+            return 1;
         }
 
-        static int j = 0;
-        public void ConcatenarLlaves(ref Dictionary<string, int> DiccionarioParaLlaves, ref string LlaveAux, byte[] byteBuffer, int i, long ultimaposicion, string UbicacionAAlmacenarLZW)
+
+        public int Descomprimir(string RutaOriginal, string[] nombreArchivo, string UbicacionAAlmacenarLZW)
         {
-            using (var streamWriter = new FileStream(UbicacionAAlmacenarLZW, FileMode.OpenOrCreate))
+            var extension = "";
+            var ContadorDeLecturas = 0;
+
+            using (var stream = new FileStream(RutaOriginal, FileMode.Open))
             {
-                using (var writer = new BinaryWriter(streamWriter))
+                using (var reader = new BinaryReader(stream))
                 {
-                    bucle:
-                    var next = Convert.ToChar(byteBuffer[i + 1]);
-                    var PosibleLlave = $"{LlaveAux}{next}";
-                    if (DiccionarioParaLlaves.ContainsKey(PosibleLlave) && (i < ultimaposicion - 1))
-                    {
-                        ConcatenarLlaves(ref DiccionarioParaLlaves, ref PosibleLlave, byteBuffer, i + 1, ultimaposicion, UbicacionAAlmacenarLZW);
-
-                        j++;
-
-                    }
-                    else
-                    {
-                        DiccionarioParaLlaves.Add(PosibleLlave, DiccionarioParaLlaves.Count + 1);
-                        goto bucle;
-                    }
+                    extension = reader.ReadString();
                 }
             }
+
+            using (var stream = new FileStream(RutaOriginal, FileMode.Open))
+            {
+                using (var reader = new BinaryReader(stream))
+                {
+                    using (var streamwriter = new FileStream($"{UbicacionAAlmacenarLZW}//{nombreArchivo[0]}.{extension}", FileMode.OpenOrCreate))
+                    {
+                        using (var writer = new BinaryWriter(streamwriter))
+                        {
+                            var byteBuffer = new byte[bufferLength];
+                            var DiccionarioLeido = false;
+                            var PosibleLlave = 0;
+                            var caracteres = new Dictionary<int, string>();
+                            var anterior = string.Empty;
+                            var actual = string.Empty;
+                            var ultimaPosicion = 0;
+                            
+                            while (reader.BaseStream.Position != reader.BaseStream.Length)
+                            {
+                                if (DiccionarioLeido == false)
+                                {
+                                    var ByteLeido = reader.ReadString();
+                                    if (ContadorDeLecturas == 0)
+                                    {
+                                        extension = ByteLeido;
+                                        ContadorDeLecturas++;
+                                    }
+                                    else if (ByteLeido != "--")
+                                    {
+                                        var separador = ByteLeido.Split('|');
+                                        caracteres.Add(Convert.ToInt32(separador[0]), separador[1]);
+                                    }
+                                    else if (ByteLeido == "--")
+                                    {
+                                        ultimaPosicion = Convert.ToInt32(reader.BaseStream.Position + 1);
+                                        break;
+                                    }
+                                }
+                            }
+                            var indice = caracteres.Count() + 1;
+
+                            while (reader.BaseStream.Position != reader.BaseStream.Length)
+                            {
+                                byteBuffer = reader.ReadBytes(bufferLength);
+                                var mensaje = string.Empty;
+                                for (int i = 0; i < byteBuffer.Length; i++)
+                                {
+                                    PosibleLlave = Convert.ToInt32(byteBuffer[i]);
+
+                                    if (i != 0)
+                                    {
+                                        mensaje = $"{anterior.Substring(anterior.Length - 1, 1)}{caracteres[PosibleLlave]}";
+                                        caracteres.Add(indice, mensaje);
+                                        anterior = caracteres[PosibleLlave];
+                                        indice++;
+                                    }
+                                    else
+                                    {
+                                        mensaje = caracteres[PosibleLlave];
+                                        writer.Write(mensaje);
+                                        anterior = mensaje;
+                                    }
+
+
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+
+            }
+            
+            return 1;
         }
     }
 }

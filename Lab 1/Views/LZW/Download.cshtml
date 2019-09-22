@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewBag.Title = "Download";
+}
+<h2>Archivos Descargables</h2>
+
+<table class="table info">
+    <tr>
+        <th>Archivos</th>
+    </tr>
+    @foreach (var item in ViewData.Model)
+    {
+        <tr>
+            <th>@Html.ActionLink((string)item, "DownloadFile", new { filename = item })</th>
+        </tr>
+
+    }
+</table>
+

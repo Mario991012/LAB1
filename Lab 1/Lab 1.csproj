@@ -172,6 +172,9 @@
     <Content Include="Views\Home\MenuPrincipal.cshtml" />
     <Content Include="Views\LZW\MenuLZW.cshtml" />
     <Content Include="Views\LZW\CargaParaComprimirL.cshtml" />
+    <Content Include="Views\LZW\CargaParaDescomprimirL.cshtml" />
+    <Content Include="Views\LZW\MostrarListaEscogida.cshtml" />
+    <Content Include="Views\LZW\Download.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
