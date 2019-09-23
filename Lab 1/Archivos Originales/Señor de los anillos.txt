@@ -1,0 +1,12 @@
+﻿- Mal uso de git, el repositorio se tardó demasiado en ser descargado
+- Dejaron "ViewBag.Tittle" en el título de la página del listado de compresiones
+- No dan feedback que el proceso fue terminado con éxito
+- Agregué un documento bastante grande y sí hubo bastante parecido, pero agregué un archivo de prueba lleno de caracteres con tildes y el resultado fue vacío
+- Las propiedades públicas van con mayúscula
+- Por qué el método leer retorna un int?
+- Intenten no usar métodos anidados, todos los métodos deben hacer 1 sola cosa
+- DiccionarioCP no es un buen nombre de una variable
+- Las variables locales empiezan en minúscula
+- if(x == false) lo pueden escribir solo como if (!x)
+- Si algo en VS les aparece como sombreado, es porque no está en uso o es redundante, quítenlo, a parte ((double)((int)((PesoOriginal / PesoCompreso) * 1000.0))) / 1000.0; tienen como 2 paréntesis de más
+- Recalcando, un singleton solo es para manejar data que va a ser persistente a través de diferentes clases y que al crear una instancia en cada lugar perderíamos los datos, no es una clase para poner toda nuestra lógica. Recuérdense del uso que le dimos el ciclo pasado.

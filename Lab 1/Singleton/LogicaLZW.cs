@@ -60,8 +60,29 @@ namespace Lab_1.Singleton
 
                             foreach (var caracter in caracteres)
                             {
-                                writer.Write($"{caracter.Value}|{caracter.Key}");
+                                var cantidadBytes = (caracter.Value / 256) + 1;
+                                byte[] bytes = new byte[cantidadBytes];
+                                var contador = 0;
+                                var binario = Convert.ToString(caracter.Value, 2);
+
+                                for (int i = 0; i < binario.Length; i = i + 8)
+                                {
+                                    var bin = binario.Substring(i, 8);
+                                    if (bin.Length < 8)
+                                        bin = Convert.ToString(bin).PadLeft(8, '0');
+
+                                    bytes[contador] = Convert.ToByte(Convert.ToInt16(bin));
+                                    contador++;
+                                }
+
+                                writer.Write(cantidadBytes);
+                                writer.Write(caracter.Key);
+                                foreach(var bytesAEscribir in bytes)
+                                {
+                                    writer.Write(bytesAEscribir);
+                                }
                             }
+
                             writer.Write("--");
                             var byteBuffer = new byte[bufferLength];
                             var PosibleLlave = string.Empty;
@@ -91,12 +112,14 @@ namespace Lab_1.Singleton
                                         i += posicionesALaDerecha - 1;
                                         posicionesALaDerecha = 0;
                                         var escrito = PosibleLlave.Substring(0, PosibleLlave.Length - 1);
-                                        var write = Convert.ToByte(caracteres[escrito]);
-                                        writer.Write(write);
-                                    }
 
+                                        if(Convert.ToInt64(caracteres[escrito]) > 255)
+                                        {
 
-
+                                        }
+                                        
+                                        //writer.Write(write);
+                            }
                                 }
                             }
                         }
@@ -108,85 +131,12 @@ namespace Lab_1.Singleton
         //METODOS PARA DESCOMPRIMIR
         public static int Descomprimir(string RutaOriginal, string[] nombreArchivo, string UbicacionAAlmacenarLZW)
         {
-            var extension = "";
-            extension = ObtenerExtension(RutaOriginal);
+            var extension = ObtenerExtension(RutaOriginal);
 
-            var CaracteresOriginales = new Dictionary<int, string>();
-            CaracteresOriginales = ObtenerDiccionarioOriginal(RutaOriginal);
+            var CaracteresOriginales = ObtenerDiccionarioOriginal(RutaOriginal);
 
             CompletarDiccionarioYEscribir(CaracteresOriginales, RutaOriginal, UbicacionAAlmacenarLZW, nombreArchivo, extension);
 
-            using (var stream = new FileStream(RutaOriginal, FileMode.Open))
-            {
-                using (var reader = new BinaryReader(stream))
-                {
-                    using (var streamwriter = new FileStream($"{UbicacionAAlmacenarLZW}//{nombreArchivo[0]}.{extension}", FileMode.OpenOrCreate))
-                    {
-                        using (var writer = new BinaryWriter(streamwriter))
-                        {
-                            var byteBuffer = new byte[bufferLength];
-                            var ExtensionLeida = false;
-                            var caracteres = new Dictionary<int, string>();
-                            var ultimaPosicion = 0;
-                            var ByteLeido = string.Empty;
-
-                            while (reader.BaseStream.Position != reader.BaseStream.Length)
-                            {
-                                ByteLeido = reader.ReadString();
-                                if (ExtensionLeida == false)
-                                {
-                                    ExtensionLeida = true;
-                                }
-                                else if (ByteLeido != "--")
-                                {
-                                    var separador = ByteLeido.Split('|');
-                                    caracteres.Add(Convert.ToInt32(separador[0]), separador[1]);
-                                }
-                                else
-                                {
-                                    ultimaPosicion = Convert.ToInt32(reader.BaseStream.Position + 1);
-                                    break;
-                                }
-                            }
-
-                            var indice = caracteres.Count() + 1;
-                            var PosibleLlave = 0;
-                            var anterior = string.Empty;
-                            var actual = string.Empty;
-
-                            while (reader.BaseStream.Position != reader.BaseStream.Length)
-                            {
-                                byteBuffer = reader.ReadBytes(bufferLength);
-                                var mensaje = string.Empty;
-                                for (int i = 0; i < byteBuffer.Length; i++)
-                                {
-                                    PosibleLlave = Convert.ToInt32(byteBuffer[i]);
-
-                                    if (i != 0)
-                                    {
-                                        actual = caracteres[PosibleLlave];
-                                        mensaje = $"{anterior.Substring(anterior.Length - 1, 1)}{caracteres[PosibleLlave]}";
-                                        caracteres.Add(indice, mensaje);
-                                        anterior = caracteres[PosibleLlave];
-                                        indice++;
-                                    }
-                                    else
-                                    {
-                                        actual = caracteres[PosibleLlave];
-                                        //mensaje = caracteres[PosibleLlave];
-                                        writer.Write(actual);
-                                        anterior = actual;
-                                    }
-
-
-                                }
-
-                            }
-                        }
-                    }
-                }
-
-            }
             return 1;
         }
 
@@ -203,6 +153,7 @@ namespace Lab_1.Singleton
             return ext;
         }
 
+        static int ultimaPosicion = 0;
         public static Dictionary<int, string> ObtenerDiccionarioOriginal(string RutaOriginal)
         {
             var DiccionarioOriginal = new Dictionary<int, string>();
@@ -212,7 +163,6 @@ namespace Lab_1.Singleton
                 {
                     var byteBuffer = new byte[bufferLength];
                     var ExtensionLeida = false;
-                    var ultimaPosicion = 0;
                     var ByteLeido = string.Empty;
 
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
@@ -229,7 +179,7 @@ namespace Lab_1.Singleton
                         }
                         else
                         {
-                            ultimaPosicion = Convert.ToInt32(reader.BaseStream.Position + 1);
+                            ultimaPosicion = Convert.ToInt32(reader.BaseStream.Position);
                             break;
                         }
                     }
@@ -253,35 +203,32 @@ namespace Lab_1.Singleton
                             var PosibleLlave = 0;
                             var anterior = string.Empty;
                             var actual = string.Empty;
-                            var KeyAgregada = string.Empty;
+                            var valorAAgregar = string.Empty;
 
                             while (reader.BaseStream.Position != reader.BaseStream.Length)
                             {
                                 byteBuffer = reader.ReadBytes(bufferLength);
                                 var mensaje = string.Empty;
-                                for (int i = 0; i < byteBuffer.Length; i++)
+                                for (int i = ultimaPosicion; i < byteBuffer.Length; i++)
                                 {
                                     PosibleLlave = Convert.ToInt32(byteBuffer[i]);
 
-                                    if (i != 0)
+                                    if (i != ultimaPosicion)
                                     {
-                                        actual = CaracteresOriginales[PosibleLlave];
-                                        //KeyAgregada = $"{anterior}{actual}";
-                                        KeyAgregada = $"{anterior.Substring(anterior.Length - 1, 1)}{CaracteresOriginales[PosibleLlave]}";
-                                        CaracteresOriginales.Add(indice, KeyAgregada);
-                                        writer.Write(actual);
-                                        anterior = CaracteresOriginales[PosibleLlave];
+                                        valorAAgregar = $"{anterior}{CaracteresOriginales[PosibleLlave].Substring(0, 1)}";
+                                        var bytes = Encoding.Default.GetBytes(CaracteresOriginales[PosibleLlave]);
+                                        foreach (var byteC in bytes)
+                                            writer.Write(byteC);
+                                        CaracteresOriginales.Add(indice, valorAAgregar);
+                                        anterior = CaracteresOriginales[PosibleLlave]; ;
                                         indice++;
                                     }
                                     else
                                     {
-                                        actual = CaracteresOriginales[PosibleLlave];
-                                        //mensaje = caracteres[PosibleLlave];
-                                        writer.Write(actual);
-                                        anterior = actual;
+                                        valorAAgregar = CaracteresOriginales[PosibleLlave];
+                                        writer.Write(Convert.ToByte(Convert.ToChar(valorAAgregar)));
+                                        anterior = valorAAgregar;
                                     }
-
-
                                 }
                             }
                         }
