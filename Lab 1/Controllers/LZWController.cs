@@ -36,7 +36,7 @@ namespace Lab_1.Controllers
                     model = Server.MapPath($"~/Archivos Originales/{NombreArray[0]}.{NombreArray[1]}");
                     var UbicacionAAlmacenarLZW = Server.MapPath("~//Archivos Comprimidos LZW");
                     file.SaveAs(model);
-                    if (LogicaLZW.Instancia.Comprimir(model, NombreArray, UbicacionAAlmacenarLZW) == 1)
+                    if (LogicaLZW.Comprimir(model, NombreArray, UbicacionAAlmacenarLZW) == 1)
                     {
                         var RutaArchivoCompreso = Server.MapPath($"~/Archivos Comprimidos LZW/{NombreArray[0]}.lzw");
 
@@ -94,7 +94,7 @@ namespace Lab_1.Controllers
                     var UbicacionDescomprimidos = Server.MapPath("~//Archivos Descomprimidos");
                     file.SaveAs(model);
 
-                    if (LogicaLZW.Instancia.Descomprimir(model, nombre, UbicacionDescomprimidos) == 1)
+                    if (LogicaLZW.Descomprimir(model, nombre, UbicacionDescomprimidos) == 1)
                     {
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
