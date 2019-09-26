@@ -8,7 +8,7 @@ namespace Lab_1.Singleton
 {
     public class LogicaLZW
     {
-        const int bufferLength = 10000;
+        const int bufferLength = 1000000;
 
         //METODOS PARA COMPRIMIR
         static public int Comprimir(string RutaOriginal, string[] NombreArchivo, string UbicacionAAlmacenarLZW)
@@ -143,12 +143,13 @@ namespace Lab_1.Singleton
                                     {
                                         //FUNCION MATEMATICA
                                         //var byteAEscribir = Convert.ToByte(DiccionarioOriginal[PosibleLlave]);
-                                        var key = DiccionarioOriginal[PosibleLlave.Substring(0, PosibleLlave.Length - 1)];
+                                        //DiccionarioOriginal.Add(PosibleLlave, indice);
+                                        var key = DiccionarioOriginal[PosibleLlave];
                                         var claveAEscribir = Convert.ToString(key, 2);
                                         var sizeArray = claveAEscribir.Length / 8 + 1;
                                         if (claveAEscribir.Length < 9)
                                         {
-                                            var byteAEscribirL = Convert.ToByte(DiccionarioOriginal[PosibleLlave.Substring(0, PosibleLlave.Length - 1)]);
+                                            var byteAEscribirL = Convert.ToByte(DiccionarioOriginal[PosibleLlave]);
                                             var Escribir1 = Convert.ToByte(1);
                                             writer.Write(Escribir1);
                                             writer.Write(byteAEscribirL);
