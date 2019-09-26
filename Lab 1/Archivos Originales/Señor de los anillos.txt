@@ -1,12 +1,84 @@
-﻿- Mal uso de git, el repositorio se tardó demasiado en ser descargado
-- Dejaron "ViewBag.Tittle" en el título de la página del listado de compresiones
-- No dan feedback que el proceso fue terminado con éxito
-- Agregué un documento bastante grande y sí hubo bastante parecido, pero agregué un archivo de prueba lleno de caracteres con tildes y el resultado fue vacío
-- Las propiedades públicas van con mayúscula
-- Por qué el método leer retorna un int?
-- Intenten no usar métodos anidados, todos los métodos deben hacer 1 sola cosa
-- DiccionarioCP no es un buen nombre de una variable
-- Las variables locales empiezan en minúscula
-- if(x == false) lo pueden escribir solo como if (!x)
-- Si algo en VS les aparece como sombreado, es porque no está en uso o es redundante, quítenlo, a parte ((double)((int)((PesoOriginal / PesoCompreso) * 1000.0))) / 1000.0; tienen como 2 paréntesis de más
-- Recalcando, un singleton solo es para manejar data que va a ser persistente a través de diferentes clases y que al crear una instancia en cada lugar perderíamos los datos, no es una clase para poner toda nuestra lógica. Recuérdense del uso que le dimos el ciclo pasado.
+﻿Pippin miró fuera amparado en la capa de Gandalf. No sabía si estaba despierto o si dormía,
+dentro aún de ese sueño vertiginoso que lo había arrebujado desde el comienzo de la larga cabalgata. El
+mundo oscuro se deslizaba veloz y el viento le canturreaba en los oídos. No veía nada más que estrellas
+fugitivas, y lejos a la derecha desfilaban las montañas del sur como sombras extendidas contra el cielo.
+Despierto sólo a medias, trató de echar cuentas sobre las jornadas y el tiempo del viaje, pero todo lo que
+le venía a la memoria era nebuloso e impreciso. Luego de una primera etapa a una velocidad terrible y sin
+un solo alto, había visto al alba un resplandor dorado y pálido, y luego llegaron a la ciudad silenciosa y a
+la gran casa desierta en la cresta de una colina. Y apenas habían tenido tiempo de refugiarse en ella
+cuando la sombra alada surcó otra vez el cielo, y todos se habían estremecido de horror. Pero Gandalf lo
+había tranquilizado con palabras dulces, y Pippin se había vuelto a dormir en un rincón, cansado pero
+inquieto, oyendo vagamente entre sueños el trajín y las conversaciones de los hombres y las voces de
+mando de Gandalf. Y luego a cabalgar otra vez, cabalgar, cabalgar en la noche. Era la segunda, no, la
+tercera noche desde que Pippin hurtara la Piedra y la escudriñara. Y con aquel recuerdo horrendo se
+despertó por completo y se estremeció, y el ruido del viento se pobló de voces amenazantes.
+Una luz se encendió en el cielo, una llamarada de fuego amarillo detrás de unas barreras
+sombrías. Pippin se acurrucó, asustado un momento, preguntándose a qué país horrible lo llevaba
+Gandalf. Se restregó los ojos, y vio entonces que era la luna, ya casi llena, que asomaba en el este por
+encima de las sombras. La noche era joven aún y el viaje en la oscuridad proseguiría durante horas y
+horas. Se sacudió y habló.
+—¿Dónde estamos, Gandalf? —preguntó.
+—En el reino de Góndor —respondió el mago—. Todavía no hemos dejado atrás las tierras de
+Ano ríen. Hubo un nuevo momento de silencio. Luego:
+—¿Qué es eso? —exclamó Pippin de improviso, aferrándose a la capa de Gandalf —. ¡Mira!
+¡Fuego, fuego rojo! ¿Hay dragones en esta región? ¡Mira, allí hay otro!
+En respuesta, Gandalf acicateó al caballo con voz vibrante.
+— ¡Corre, Sombragris! ¡Llevamos prisa! El tiempo apremia. ¡Mira! Gondor ha encendido las
+almenaras pidiendo ayuda. La guerra ha comenzado. Mira, hay fuego sobre las crestas del Amon Din y
+llamas en el Eilenach; y avanzan veloces hacia el oeste: hacia el Nardol, el Érelas, MinRimmon, Calenhad
+y el Halifirien en los confines de Rohan.
+Pero el corcel aminoró la marcha, y avanzando al paso, levantó la cabeza y relinchó. Y desde la
+oscuridad le respondió el relincho de otros caballos, seguido por un sordo rumor de cascos; y de pronto
+tres jinetes surgieron como espectros alados a la luz de la luna y desaparecieron, rumbo al oeste.
+Sombragris corrió alejándose, y la noche lo envolvió como un viento rugiente.
+Otra vez vencido por la somnolencia, Pippin escuchaba sólo a medias lo que le contaba Gandalf
+acerca de las costumbres de Gondor, y de por qué el Señor de la Ciudad había puesto almenaras en las
+crestas de las colinas a ambos lados de las fronteras, y mantenía allí postas de caballería siempre prontas a
+llevar mensajes a Rohan en el Norte, o a Belfalas en el Sur.
+—Hacía mucho tiempo que no se encendían las almenaras del norte —dijo Gandalf—; en los
+días de la antigua Gondor no eran necesarias, ya que entonces tenían las Siete Piedras.
+Pippin se agitó, intranquilo.
+—¡Duérmete otra vez y no temas! —le dijo Gandalf—. Tú no vas como Frodo, rumbo a Mordor,
+sino a Minas Tirith, y allí estarás a salvo, al menos tan a salvo como es posible en los tiempos que corren.
+Si Gondor cae, o si el Anillo pasa a manos del enemigo, entonces ni la Comarca será un refugio seguro.
+—No me tranquilizan tus palabras —dijo Pippin, pero a pesar de todo volvió a dormirse. Lo
+último que alcanzó a ver antes de caer en un sueño profundo fue unas cumbres altas y blancas, que
+centelleaban como islas flotantes por encima de las nubes a la luz de una luna que descendía en el
+poniente. Se preguntó qué sería de Frodo, si ya habría llegado a Mordor, o si estaría muerto, sin sospechar
+que muy lejos de allí Frodo contemplaba aquella misma luna que se escondía detrás de las montañas de 
+4
+Gondor antes que clareara el día El sonido de unas voces despertó a Pippin. Otro día de campamento
+furtivo y otra noche de cabalgata habían quedado atrás. Amanecía: la aurora fría estaba cerca otra vez, y
+los envolvía en unas neblinas heladas. Sombragris humeaba de sudor, pero erguía la cabeza con
+arrogancia y no mostraba signos de fatiga. Pippin vio en torno una multitud de hombres de elevada
+estatura envueltos en mantos pesados, y en la niebla detrás de ellos se alzaba un muro de piedra. Parecía
+estar casi en ruinas, pero ya antes del final de la noche empezaron a oírse los ruidos de una actividad
+incesante: el golpe de los martillos, el chasquido de las trullas, el chirrido de las ruedas. Las antorchas y
+las llamas de las hogueras resplandecían débilmente en la bruma. Gandalf hablaba con los hombres que le
+interceptaban el paso, y Pippin comprendió entonces que él era el motivo de la discusión.
+—Sí, es verdad, a ti te conocemos, Mithrandir —decía el jefe de los hombres—, y puesto que
+conoces el santo y seña de las Siete Puertas, eres libre de proseguir tu camino. Pero a tu compañero no lo
+hemos visto nunca. ¿Qué es? ¿Un enano de las montañas del Norte? No queremos extranjeros en el país
+en estos tiempos, a menos que se trate de hombres de armas vigorosos, en cuya lealtad y ayuda podamos
+confiar.
+—Yo responderé por él ante Denethor —dijo Gandalf—, y en cuanto al valor, no lo has de medir
+por el tamaño. Ha presenciado más batallas y sobrevivido a más peligros que tú, Ingold, aunque le dobles
+en altura; ahora viene del ataque a Isengard, del que traemos buenas nuevas, y está extenuado por la
+fatiga, de lo contrario ya lo habría despertado. Se llama Peregrin y es un hombre muy valiente.
+—¿Un hombre? —dijo Ingold con aire dubitativo, y los otros se echaron a reír.
+— ¡Un hombre! —gritó Pippin, ahora bien despierto—. ¡Un hombre! ¡Nada menos cierto! Soy
+un hobbit, y de valiente tengo tan poco como de hombre, excepto quizá de tanto en tanto y sólo por
+necesidad. ¡No os dejéis engañar por Gandalf!
+—Muchos protagonistas de grandes hazañas no podrían decir más que tú —dijo Ingold—. ¿Pero
+qué es un hobbit?
+—Un mediano —respondió Gandalf—. No, no aquél de quien se ha hablado —añadió, viendo
+asombro en los rostros de los hombres—. No es ése, pero sí uno de la misma raza.
+—Sí, y uno que ha viajado con él —dijo Pippin—. Y Boromir, de vuestra ciudad, estaba con
+nosotros, y me salvó en las nieves del Norte, y finalmente perdió la vida defendiéndome de numerosos
+enemigos.
+—¡Silencio! —dijo Gandalf—. Esta triste nueva tendría que serle anunciada al padre antes que a
+ninguno.
+—Ya la habíamos adivinado —dijo Ingold—, pues en los últimos tiempos hubo aquí extraños
+presagios. Mas pasad ahora rápidamente. El Señor de Minas Tirith querrá ver en seguida a quien le trae
+las últimas noticias de su hijo, sea hombre o...
+Faramir, y no por las de Boromir, en cambio, que sin embargo era el predilecto. Sabe ver a la distancia, y 

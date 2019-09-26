@@ -8,19 +8,28 @@ namespace Lab_1.Singleton
 {
     public class LogicaLZW
     {
-        const int bufferLength = 1000;
+        const int bufferLength = 10000;
 
         //METODOS PARA COMPRIMIR
         static public int Comprimir(string RutaOriginal, string[] NombreArchivo, string UbicacionAAlmacenarLZW)
         {
-            var caracteres = new Dictionary<string, int>();
+            var diccionarioOriginal = new Dictionary<string, int>();
+            var diccionarioTemporal = new Dictionary<string, int>();
             var indice = 1;
-            caracteres = ObtenerDiccionarioCaracteresEspeciales(RutaOriginal, ref indice);
-            JuntarCaracteresYEscribir(caracteres, ref indice, RutaOriginal, NombreArchivo, UbicacionAAlmacenarLZW);
+            var valorDiccionario = 0;
+            //COMPLETADO
+            diccionarioOriginal = ObtenerDiccionarioCaracteresEspeciales(RutaOriginal, ref indice, ref diccionarioTemporal);
+            valorDiccionario = indice;
+
+            //COMPLETADO
+            //var cantidadMaximaDiccionario = ObtenerCantidadMax(diccionarioTemporal, ref indice, RutaOriginal, NombreArchivo, UbicacionAAlmacenarLZW);
+            var cantidadMaximaDiccionario = 5;
+            EscribirLZW(diccionarioOriginal, valorDiccionario, RutaOriginal, NombreArchivo, UbicacionAAlmacenarLZW, cantidadMaximaDiccionario);
+
             return 1;
         }
 
-        static public Dictionary<string, int> ObtenerDiccionarioCaracteresEspeciales(string RutaOriginal, ref int indice)
+        static public Dictionary<string, int> ObtenerDiccionarioCaracteresEspeciales(string RutaOriginal, ref int indice, ref Dictionary<string, int> diccionarioTemporal)
         {
             var DiccionarioAEscribir = new Dictionary<string, int>();
             using (var stream = new FileStream(RutaOriginal, FileMode.Open))
@@ -37,6 +46,7 @@ namespace Lab_1.Singleton
                             if (!DiccionarioAEscribir.ContainsKey(Convert.ToString(Convert.ToChar(byteBuffer[i]))))
                             {
                                 DiccionarioAEscribir.Add(Convert.ToString(Convert.ToChar(byteBuffer[i])), indice);
+                                diccionarioTemporal.Add(Convert.ToString(Convert.ToChar(byteBuffer[i])), indice);
                                 indice++;
                             }
                         }
@@ -46,7 +56,46 @@ namespace Lab_1.Singleton
             return DiccionarioAEscribir;
         }
 
-        static public void JuntarCaracteresYEscribir(Dictionary<string, int> caracteres, ref int indice, string RutaOriginal, string[] NombreArchivo, string UbicacionAAlmacenarLZW)
+        static public int ObtenerCantidadMax( Dictionary<string, int> caracteres, ref int indice, string RutaOriginal, string[] NombreArchivo, string UbicacionAAlmacenarLZW)
+        {
+            var D = new Dictionary<string, int>();
+            D = caracteres;
+            using (var stream = new FileStream(RutaOriginal, FileMode.Open))
+            {
+                using (var reader = new BinaryReader(stream))
+                {
+                    var byteBuffer = new byte[bufferLength];
+                    var PosibleLlave = string.Empty;
+                    var posicionesALaDerecha = 0;
+
+                    while (reader.BaseStream.Position != reader.BaseStream.Length)
+                    {
+                        byteBuffer = reader.ReadBytes(bufferLength);
+                        for (int i = 0; i < byteBuffer.Length; i++)
+                        {
+                            PosibleLlave = Convert.ToString(Convert.ToChar(byteBuffer[i]));
+
+                            while (D.ContainsKey(PosibleLlave) && i + posicionesALaDerecha < byteBuffer.Length-1)
+                            {
+                                posicionesALaDerecha++;
+                                PosibleLlave = $"{PosibleLlave}{Convert.ToString(Convert.ToChar(byteBuffer[i + posicionesALaDerecha]))}";
+                            }
+                            if (i + 1 < byteBuffer.Length)
+                            {
+                                D.Add(PosibleLlave, indice);
+                                indice++;
+                                i += posicionesALaDerecha - 1;
+                                posicionesALaDerecha = 0;
+
+                            }
+                        }
+                    }
+                    return D.Count;
+                }
+            }
+        }
+
+        static public void EscribirLZW(Dictionary<string, int> DiccionarioOriginal, int indice, string RutaOriginal, string[] NombreArchivo, string UbicacionAAlmacenarLZW, int cantidadMaximaDiccionario)
         {
             using (var stream = new FileStream(RutaOriginal, FileMode.Open))
             {
@@ -56,78 +105,204 @@ namespace Lab_1.Singleton
                     {
                         using (var writer = new BinaryWriter(streamWriter))
                         {
-                            writer.Write(NombreArchivo[1]);
-
-                            foreach (var caracter in caracteres)
-                            {
-                                var cantidadBytes = (caracter.Value / 256) + 1;
-                                byte[] bytes = new byte[cantidadBytes];
-                                var contador = 0;
-                                var binario = Convert.ToString(caracter.Value, 2);
-
-                                for (int i = 0; i < binario.Length; i = i + 8)
-                                {
-                                    var bin = binario.Substring(i, 8);
-                                    if (bin.Length < 8)
-                                        bin = Convert.ToString(bin).PadLeft(8, '0');
-
-                                    bytes[contador] = Convert.ToByte(Convert.ToInt16(bin));
-                                    contador++;
-                                }
-
-                                writer.Write(cantidadBytes);
-                                writer.Write(caracter.Key);
-                                foreach(var bytesAEscribir in bytes)
-                                {
-                                    writer.Write(bytesAEscribir);
-                                }
-                            }
-
-                            writer.Write("--");
+                            //var cantidadBytesBinario = Convert.ToString(cantidadMaximaDiccionario,2);
+                            //var cantidadBytes = cantidadBytesBinario.Length / 8 + 1;
                             var byteBuffer = new byte[bufferLength];
                             var PosibleLlave = string.Empty;
                             var posicionesALaDerecha = 0;
-
+                            writer.Write(NombreArchivo[1]);
+                            foreach (var item in DiccionarioOriginal)
+                            {
+                                writer.Write($"{item.Key}|{item.Value}");
+                            }
+                            writer.Write("--");
+                            var anterior = string.Empty;
+                            var actual = string.Empty;
                             while (reader.BaseStream.Position != reader.BaseStream.Length)
                             {
                                 byteBuffer = reader.ReadBytes(bufferLength);
+
+                                
+
+
                                 for (int i = 0; i < byteBuffer.Length; i++)
                                 {
                                     PosibleLlave = Convert.ToString(Convert.ToChar(byteBuffer[i]));
 
-                                    while (caracteres.ContainsKey(PosibleLlave) && i + 1 < byteBuffer.Length)
+                                    while (DiccionarioOriginal.ContainsKey(PosibleLlave) && i + posicionesALaDerecha <= byteBuffer.Length)
                                     {
                                         posicionesALaDerecha++;
-                                        PosibleLlave = $"{PosibleLlave}{Convert.ToString(Convert.ToChar(byteBuffer[i + posicionesALaDerecha]))}";
+                                        if (i+posicionesALaDerecha < byteBuffer.Length)
+                                        {
+                                            PosibleLlave = $"{PosibleLlave}{Convert.ToString(Convert.ToChar(byteBuffer[i + posicionesALaDerecha]))}";
+                                        }
                                     }
-
-                                    if (i + 1 >= byteBuffer.Length)
+                                    i += posicionesALaDerecha - 1;
+                                    posicionesALaDerecha = 0;
+                                    if (i + 1 >= byteBuffer.Length)//PARA EL ULTIMO CARACTER
                                     {
-                                        writer.Write(Convert.ToByte(caracteres[PosibleLlave]));
+                                        //FUNCION MATEMATICA
+                                        //var byteAEscribir = Convert.ToByte(DiccionarioOriginal[PosibleLlave]);
+                                        var key = DiccionarioOriginal[PosibleLlave.Substring(0, PosibleLlave.Length - 1)];
+                                        var claveAEscribir = Convert.ToString(key, 2);
+                                        var sizeArray = claveAEscribir.Length / 8 + 1;
+                                        if (claveAEscribir.Length < 9)
+                                        {
+                                            var byteAEscribirL = Convert.ToByte(DiccionarioOriginal[PosibleLlave.Substring(0, PosibleLlave.Length - 1)]);
+                                            var Escribir1 = Convert.ToByte(1);
+                                            writer.Write(Escribir1);
+                                            writer.Write(byteAEscribirL);
+                                            indice++;
+
+                                        }
+                                        else
+                                        {
+                                            var ByteArray = new byte[sizeArray];
+                                            var SizeByte = Convert.ToByte(sizeArray);
+                                            var contadorPosicion = sizeArray - 1;
+                                            var LongitudBinario = claveAEscribir.Length;
+                                            for (int m = LongitudBinario; m > 0; m -= 8)
+                                            {
+                                                if (claveAEscribir.Length > 8)
+                                                {
+                                                    var ByteAEscribirL = claveAEscribir.Substring(m - 8, 8);
+                                                    var ByteAEscribir = Convert.ToByte(Convert.ToInt32(ByteAEscribirL, 2));
+                                                    ByteArray[contadorPosicion] = ByteAEscribir;
+                                                    claveAEscribir = claveAEscribir.Substring(0, m - 8);
+                                                }
+                                                else
+                                                {
+                                                    claveAEscribir = claveAEscribir.PadLeft(8, '0');
+                                                    var ByteAEscribir = Convert.ToByte(Convert.ToInt32(claveAEscribir, 2));
+                                                    ByteArray[contadorPosicion] = ByteAEscribir;
+                                                }
+                                                contadorPosicion--;
+                                            }
+                                            writer.Write(SizeByte);
+                                            writer.Write(ByteArray);
+                                            //for (int j = claveAEscribir.Length -1; j > 0; j-=8)
+                                            //{
+                                            //    StringArray[contadorString] = claveAEscribir.Substring(j-8, 8);
+                                            //    if (StringArray[contadorString].Length < 8)
+                                            //    {
+                                            //        StringArray[contadorString] = StringArray[contadorString].PadLeft(8,'0');
+                                            //    }
+                                            //    contadorString--;
+                                            //}
+                                            //for (int m = 0; m < ByteArray.Length; m++)
+                                            //{
+                                            //    ByteArray[m] = Convert.ToByte(StringArray[m]);
+                                            //}
+                                            //writer.Write(sizeArray);
+                                            //writer.Write(ByteArray);
+                                        }
                                     }
                                     else
                                     {
-                                        caracteres.Add(PosibleLlave, indice);
-                                        indice++;
-                                        i += posicionesALaDerecha - 1;
-                                        posicionesALaDerecha = 0;
-                                        var escrito = PosibleLlave.Substring(0, PosibleLlave.Length - 1);
+                                        DiccionarioOriginal.Add(PosibleLlave, indice);
+                                        //FUNCION MATEMATICA COMPLETADA
+                                        var key = DiccionarioOriginal[PosibleLlave.Substring(0, PosibleLlave.Length - 1)];
+                                        var claveAEscribir = Convert.ToString(key, 2);
 
-                                        if(Convert.ToInt64(caracteres[escrito]) > 255)
-                                        {
-
-                                        }
+                                        var sizeArray = claveAEscribir.Length / 8 + 1;
                                         
-                                        //writer.Write(write);
-                            }
+                                        if (claveAEscribir.Length < 9)
+                                        {
+                                            var byteAEscribirL = Convert.ToByte(DiccionarioOriginal[PosibleLlave.Substring(0, PosibleLlave.Length - 1)]);
+                                            var Escribir1 = Convert.ToByte(1);
+                                            writer.Write(Escribir1);
+                                            writer.Write(byteAEscribirL);
+                                            indice++;
+                                            
+                                        }
+                                        else
+                                        {
+                                            var ByteArray = new byte[sizeArray];
+                                            var SizeByte = Convert.ToByte(sizeArray);
+                                            var contadorPosicion = sizeArray-1;
+                                            var LongitudBinario = claveAEscribir.Length;
+                                            for (int m = LongitudBinario; m > 0; m -=8)
+                                            {
+                                                if (claveAEscribir.Length > 8)
+                                                {
+                                                    var ByteAEscribirL = claveAEscribir.Substring(m-8,8);
+                                                    var ByteAEscribir = Convert.ToByte(Convert.ToInt32(ByteAEscribirL,2));
+                                                    ByteArray[contadorPosicion] = ByteAEscribir;
+                                                    claveAEscribir = claveAEscribir.Substring(0, m - 8);
+                                                }
+                                                else
+                                                {
+                                                    claveAEscribir = claveAEscribir.PadLeft(8, '0');
+                                                    var ByteAEscribir = Convert.ToByte(Convert.ToInt32(claveAEscribir,2));
+                                                    ByteArray[contadorPosicion] = ByteAEscribir;
+                                                }
+                                                contadorPosicion--;
+                                            }
+                                            writer.Write(SizeByte);
+                                            writer.Write(ByteArray);
+                                            //for (int j = claveAEscribir.Length -1; j > 0; j-=8)
+                                            //{
+                                            //    StringArray[contadorString] = claveAEscribir.Substring(j-8, 8);
+                                            //    if (StringArray[contadorString].Length < 8)
+                                            //    {
+                                            //        StringArray[contadorString] = StringArray[contadorString].PadLeft(8,'0');
+                                            //    }
+                                            //    contadorString--;
+                                            //}
+                                            //for (int m = 0; m < ByteArray.Length; m++)
+                                            //{
+                                            //    ByteArray[m] = Convert.ToByte(StringArray[m]);
+                                            //}
+                                            //writer.Write(sizeArray);
+                                            //writer.Write(ByteArray);
+                                        }
+
+                                        //ESTO ESTA BUENO
+                                        //var byteAEscribir = Convert.ToByte(DiccionarioOriginal[PosibleLlave.Substring(0, PosibleLlave.Length - 1)]);
+                                        //writer.Write(byteAEscribir);
+                                        //indice++;
+                                        //i += posicionesALaDerecha - 1;
+                                        //posicionesALaDerecha = 0;
+
+                                    }
                                 }
                             }
+
+                            //if (cantidadBytesAUtilizar > 1)
+                            //{
+
+                            //}
+
+                            //foreach (var caracter in caracteres)
+                            //{
+                            //    var cantidadBytes = (caracter.Value / 256) + 1;
+                            //    byte[] bytes = new byte[cantidadBytes];
+                            //    var contador = 0;
+                            //    var binario = Convert.ToString(caracter.Value, 2);
+
+                            //    for (int i = 0; i < binario.Length; i = i + 8)
+                            //    {
+                            //        var bin = binario.Substring(i, 8);
+                            //        if (bin.Length < 8)
+                            //        { bin = Convert.ToString(bin).PadLeft(8, '0'); }
+
+                            //        bytes[contador] = Convert.ToByte(Convert.ToInt16(bin));
+                            //        contador++;
+                            //    }
+
+                            //    writer.Write(cantidadBytes);
+                            //    writer.Write(caracter.Key);
+                            //    foreach(var bytesAEscribir in bytes)
+                            //    {
+                            //        writer.Write(bytesAEscribir);
+                            //    }
+                            //}
                         }
                     }
                 }
             }
         }
-
+        
         //METODOS PARA DESCOMPRIMIR
         public static int Descomprimir(string RutaOriginal, string[] nombreArchivo, string UbicacionAAlmacenarLZW)
         {
