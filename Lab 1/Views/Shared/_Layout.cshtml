@@ -19,15 +19,14 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar" ></span>
                 </button>
-                @Html.ActionLink("HUFFMAN", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("MenuPrincipal", "MenuPrincipal", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Inicio", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Compresión", "CargaParaComprimir", "Home")</li>
-                    <li>@Html.ActionLink("Descompresión", "CargaParaDescomprimir", "Home")</li>
+                    <li>@Html.ActionLink("HUFFMAN", "Index", "Home")</li>
+                    <li>@Html.ActionLink("LZW", "MenuLZW", "LZW")</li>
                     <li>@Html.ActionLink("Datos de compresion", "ListaArchivos", "Home")</li>
-                    <li>@Html.ActionLink("Archivos Descargables", "MostrarOpciones", "Home", new { } )</li>
+                    <li>@Html.ActionLink("Archivos Descargables", "MostrarOpciones", "Home", new { })</li>
                 </ul>
             </div>
         </div>

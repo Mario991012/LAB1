@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "Escoga la opcion deseada";
+}
+
+<h2>COMPRESION LZW</h2>
+
+
+
+<div class="jumbotron" style="color:darkblue">
+    <h2 class="display-3"> LZW: Compresión</h2>
+    <h4 class="display-3"> Comprima el archivo que desee</h4>
+    <p class="lead">
+
+        <h4>LZW</h4>
+        <h4><button type="button" onclick="location.href= '@Url.Action("CargaParaComprimirL","LZW")'">Compresion </button></h4>
+
+    </p>
+</div>
+
+<div class="jumbotron" style="color:peru">
+    <h2 class="display-3"> LZW: Descompresión</h2>
+    <h4 class="display-3"> Descomprima el archivo escogido</h4>
+    <p class="lead">
+
+        <h4>LZW</h4>
+        <h4><button type="button" onclick="location.href= '@Url.Action("CargaParaDescomprimirL","LZW")'">Descompresion </button></h4>
+
+    </p>
+</div>
+
+<div class="jumbotron" style="color:olivedrab">
+    <h2 class="display-3"> LZW: Archivos Descargables</h2>
+    <h4 class="display-3">Descargue los archivos comprimidos o descomprimidos procesados</h4>
+    <p class="lead">
+        <h4>HUFFMAN</h4>
+        <h4><button type="button" onclick="location.href= '@Url.Action("MostrarOpcionesL","Home")'">Descargables </button></h4>
+    </p>
+</div>

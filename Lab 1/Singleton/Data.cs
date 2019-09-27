@@ -24,10 +24,10 @@ namespace Lab_1.Singleton
         public Estructuras.ArbolS Arbol = new Estructuras.ArbolS();
         public Dictionary<byte, string> CodigosPrefijoArchivoActual = new Dictionary<byte, string>();
         public Dictionary<string, Archivos> DatosDeArchivos = new Dictionary<string, Archivos>();
-        public Dictionary<string, string> CodigoPD = new Dictionary<string, string>();
+        public Dictionary<string, byte> CodigoPD = new Dictionary<string, byte>();
         const int bufferLength = 1000;
 
-        public int Leer(string path, string[] nombreArchivo, string pathHuffman)
+        public int CompresiónHuffman(string path, string[] nombreArchivo, string pathHuffman)
         {
             var ListaNodos = new List<Estructuras.Nodo>();
             var Frecuencias = new Dictionary<byte, int>();
@@ -58,36 +58,30 @@ namespace Lab_1.Singleton
                         nodo.Frecuencia = nodos.Value;
                         nodo.Valor = nodos.Key;
                         ListaNodos.Add(nodo);
-                        ListaNodos.Sort((x, y) => x.CompareTo(y));
                     }
+                    ListaNodos.Sort((x, y) => x.CompareTo(y));
 
                 }
             }
-            CrearArbol(ListaNodos, nombreArchivo, pathHuffman, path);
 
-            return 1;
-        }
-
-        public void CrearArbol(List<Estructuras.Nodo> ListNodos, string[] nombreArchivo, string pathHuffman, string path)
-        {
-            while (ListNodos.Count >= 2)
+            while (ListaNodos.Count >= 2)
             {
                 Estructuras.Nodo padre = new Estructuras.Nodo();
-                ListNodos[0].recorridoIzq = true;
-                ListNodos[1].recorridoDer = true;
-                padre.izq = ListNodos[0];
-                padre.der = ListNodos[1];
+                ListaNodos[0].recorridoIzq = true;
+                ListaNodos[1].recorridoDer = true;
+                padre.izq = ListaNodos[0];
+                padre.der = ListaNodos[1];
                 padre.Frecuencia = padre.izq.Frecuencia + padre.der.Frecuencia;
-                ListNodos[0].padre = padre;
-                ListNodos[1].padre = padre;
+                ListaNodos[0].padre = padre;
+                ListaNodos[1].padre = padre;
                 var cont = 0;
                 var agregado = false;
-                foreach (var item in ListNodos)
+                foreach (var item in ListaNodos)
                 {
                     cont++;
                     if (padre.Frecuencia <= item.Frecuencia)
                     {
-                        ListNodos.Insert(cont - 1, padre);
+                        ListaNodos.Insert(cont - 1, padre);
                         agregado = true;
                         break;
                     }
@@ -95,23 +89,61 @@ namespace Lab_1.Singleton
 
                 if (agregado == false)
                 {
-                    ListNodos.Add(padre);
+                    ListaNodos.Add(padre);
                 }
 
-                ListNodos.Remove(ListNodos[0]);
-                ListNodos.Remove(ListNodos[0]);
-
+                ListaNodos.Remove(ListaNodos[0]);
+                ListaNodos.Remove(ListaNodos[0]);
             }
 
             Estructuras.ArbolS tree = new Estructuras.ArbolS();
-            tree.raiz = ListNodos[0];
-            ListNodos.Clear();
+            tree.raiz = ListaNodos[0];
+            ListaNodos.Clear();
             ObteniendoCodigoPrefijo(tree.raiz);
             CodigosPrefijo.Add(nombreArchivo[0], CodigosPrefijoArchivoActual);
 
-            EscribiendoHuffman(nombreArchivo, CodigosPrefijoArchivoActual, pathHuffman, path);
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                using (var reader = new BinaryReader(stream))
+                {
+                    using (var writeStream = new FileStream($"{pathHuffman}/{nombreArchivo[0]}.huff", FileMode.OpenOrCreate))
+                    {
+                        using (var writer = new BinaryWriter(writeStream))
+                        {
+                            var DiccionarioActual = CodigosPrefijo[nombreArchivo[0]];
+                            writer.Write(nombreArchivo[1]);
 
+                            foreach (var codigo in DiccionarioActual)
+                            {
+                                writer.Write($"{codigo.Key}|{codigo.Value}|");
+                            }
+                            writer.Write("--");
 
+                            var byteBuffer = new byte[bufferLength];
+                            var PosibleLlave = string.Empty;
+                            while (reader.BaseStream.Position != reader.BaseStream.Length)
+                            {
+                                byteBuffer = reader.ReadBytes(bufferLength);
+                                
+                                for (int i = 0; i < byteBuffer.Length; i++)
+                                {
+                                    PosibleLlave = $"{PosibleLlave}{DiccionarioActual[byteBuffer[i]]}";
+                                    
+                                    while(PosibleLlave.Length > 8)
+                                    {
+                                        var decimaln = Convert.ToInt32(PosibleLlave.Substring(0, 8) , 2);
+                                        var Caracter = Convert.ToByte(decimaln);
+                                        writer.Write(Caracter);
+                                        PosibleLlave = PosibleLlave.Substring(8);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            CodigosPrefijoArchivoActual.Clear();
+            return 1;
         }
 
         static string codigo;
@@ -151,169 +183,77 @@ namespace Lab_1.Singleton
             }
         }
 
-        public void EscribiendoHuffman(string[] FileName, Dictionary<byte, string> DiccionarioCP, string pathHuffman, string path)
+        public int Descompresion(string path, string[] nombreArchivo, string pathHuffman)
         {
+            var extension = "";
+            var ContadorDeLecturas = 0;
+
             using (var stream = new FileStream(path, FileMode.Open))
             {
                 using (var reader = new BinaryReader(stream))
                 {
-                    using (var writeStream = new FileStream($"{pathHuffman}/{FileName[0]}.huff", FileMode.OpenOrCreate))
+                    extension = reader.ReadString();
+                }
+            }
+
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                using (var reader = new BinaryReader(stream))
+                {
+                    using (var streamwriter = new FileStream($"{pathHuffman}//{nombreArchivo[0]}.{extension}", FileMode.OpenOrCreate))
                     {
-                        using (var writer = new BinaryWriter(writeStream))
+                        using (var archivo = new BinaryWriter(streamwriter))
                         {
                             var byteBuffer = new byte[bufferLength];
-                            var Text = new List<char>();
-                            var ListaAscii = new List<byte>();
-                            var caracteres = new List<byte>();
+                            var DiccionarioLeido = false;
+                            var LlavePosible = string.Empty;
                             while (reader.BaseStream.Position != reader.BaseStream.Length)
                             {
-                                byteBuffer = reader.ReadBytes(bufferLength);
-
-                                foreach (var caracter in byteBuffer)
+                                if (DiccionarioLeido == false)
                                 {
-                                    var codigoPrefijo = DiccionarioCP[caracter].ToCharArray();
-                                    foreach (var binario in codigoPrefijo)
+                                    var ByteLeido = reader.ReadString();
+                                    if (ContadorDeLecturas == 0)
                                     {
-                                        Text.Add(binario);
+                                        extension = ByteLeido;
+                                        ContadorDeLecturas++;
+                                    }
+                                    else if (ByteLeido != "--" && DiccionarioLeido == false)
+                                    {
+                                        var separador = ByteLeido.Split('|');
+                                        CodigoPD.Add(separador[1], Convert.ToByte(separador[0]));
+                                    }
+                                    else if (ByteLeido == "--")
+                                    {
+                                        DiccionarioLeido = true;
+                                    }
+                                }
+                                else
+                                {
+                                    byteBuffer = reader.ReadBytes(bufferLength);
 
-                                        if (Text.Count >= 8)
+                                    for (int i = 0; i < byteBuffer.Length; i++)
+                                    {
+                                        LlavePosible = $"{LlavePosible}{Convert.ToString(Convert.ToInt32(byteBuffer[i]),2).PadLeft(8,'0')}";
+                                        var contadorBits = 1;
+                                        while(contadorBits <= LlavePosible.Length)
                                         {
-                                            var enlistado = "";
-                                            byte ascii;
-                                            foreach (var bin in Text)
+                                            if(CodigoPD.ContainsKey(LlavePosible.Substring(0,contadorBits)))
                                             {
-                                                enlistado = $"{enlistado}{bin}";
+                                                archivo.Write(CodigoPD[LlavePosible.Substring(0, contadorBits)]);
+                                                LlavePosible = LlavePosible.Substring(contadorBits);
+                                                contadorBits = 0;
                                             }
-                                            var decimalascii = Convert.ToInt32(enlistado, 2);
-                                            ascii = (byte)decimalascii;
-                                            ListaAscii.Add(ascii);
-                                            Text.Clear();
+                                            contadorBits++;
                                         }
                                     }
                                 }
                             }
-
-                            var DicAux = CodigosPrefijo[FileName[0]];
-                            writer.Write(FileName[1]);
-                            foreach (var codigo in DicAux)
-                            {
-                                writer.Write($"{codigo.Key}|{codigo.Value}|");
-                            }
-                            writer.Write("--");
-
-                            foreach (var item in ListaAscii)
-                            {
-                                writer.Write(item);
-                            }
                         }
                     }
+                    CodigoPD.Clear();
                 }
             }
-            CodigosPrefijoArchivoActual.Clear();
+            return 1;
         }
-
-        public int Descompresion(string path, string[] nombreArchivo, string pathHuffman)
-        {
-            List<string> BinaryList = new List<string>();
-            try
-            {
-                var extension = "";
-                var ContadorDeLecturas = 0;
-                using (var stream = new FileStream(path, FileMode.Open))
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        var byteBuffer = new byte[bufferLength];
-                        var DiccionarioLeido = false;
-
-                        while (reader.BaseStream.Position != reader.BaseStream.Length)
-                        {
-                            if (DiccionarioLeido == false)
-                            {
-                                var ByteLeido = reader.ReadString();
-                                if (ContadorDeLecturas == 0)
-                                {
-                                    extension = ByteLeido;
-                                    ContadorDeLecturas++;
-                                }
-                                else if (ByteLeido != "--" && DiccionarioLeido == false)
-                                {
-                                    var separador = ByteLeido.Split('|');
-                                    CodigoPD.Add(separador[1], separador[0]);
-                                }
-                                else if (ByteLeido == "--")
-                                {
-                                    DiccionarioLeido = true;
-                                }
-                            }
-                            else
-                            {
-                                var ByteLeido = reader.ReadByte();
-                                var BinaryCode = Convert.ToString(ByteLeido, 2).PadLeft(8, '0');
-                                BinaryList.Add(BinaryCode);
-                            }
-                        }
-                        ObtenerCaracter(BinaryList, CodigoPD, pathHuffman, nombreArchivo, extension, path);
-                        CodigoPD.Clear();
-                    }
-                }
-
-                return 1;
-            }
-            catch
-            {
-                return 0;
-            }
-        }
-
-        static int CountOfBytes = 0;
-        static string BinaryC = "";
-        static int PosicionLinea = 0;
-        public void ObtenerCaracter(List<string> BinaryList, Dictionary<string, string> CodigoPD, string pathHuffman, string[] nombreArchivo, string extension, string path)
-        {
-            using (var stream = new FileStream($"{pathHuffman}//{nombreArchivo[0]}.{extension}", FileMode.OpenOrCreate))
-            {
-                using (var archivo = new BinaryWriter(stream))
-                {
-
-                    var CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
-                reinicio:
-                    do
-                    {
-                        BinaryC = $"{BinaryC}{CharOfBytes[CountOfBytes]}";
-                        CountOfBytes++;
-                        RecorrerBinaryListRecursivamente(CodigoPD, ref BinaryC);
-                        if (TextoDescomprimido.Length > 0)
-                        {
-                            var bytes = Encoding.GetEncoding("Windows-1252").GetBytes(TextoDescomprimido);
-                            archivo.Write(bytes);
-                            TextoDescomprimido = string.Empty;
-                            archivo.Flush();
-                        }
-                    } while (CountOfBytes < CharOfBytes.Length);
-
-                    PosicionLinea++;
-                    CountOfBytes = 0;
-                    if (BinaryList.Count > PosicionLinea)
-                    {
-                        CharOfBytes = BinaryList[PosicionLinea].ToCharArray();
-                        goto reinicio;
-                    }
-                }
-            }
-
-        }
-        static string TextoDescomprimido = "";
-        public void RecorrerBinaryListRecursivamente(Dictionary<string, string> CodigoPD, ref string BinaryC)
-        {
-            if (CodigoPD.ContainsKey(BinaryC))
-            {
-                var dec = Convert.ToInt32(CodigoPD[BinaryC]);
-                var letra = Convert.ToChar(dec);
-                TextoDescomprimido = $"{TextoDescomprimido}{letra}";
-                BinaryC = string.Empty;
-            }
-        }
-
     }
 }
