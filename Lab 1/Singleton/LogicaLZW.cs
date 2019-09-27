@@ -118,8 +118,6 @@ namespace Lab_1.Singleton
                             {
                                 byteBuffer = reader.ReadBytes(bufferLength);
 
-                                
-
 
                                 for (int i = 0; i < byteBuffer.Length; i++)
                                 {
@@ -336,8 +334,8 @@ namespace Lab_1.Singleton
                                         }
                                         else
                                         {
+                                            CaracteresOriginales.Add(indice, $"{anterior.Substring(anterior.Length - 1, 1)}{actual}");
                                             anterior = $"{anterior.Substring(anterior.Length - 1, 1)}{actual}";
-                                            CaracteresOriginales.Add(indice, anterior);
                                             indice++;
                                         }
                                         
