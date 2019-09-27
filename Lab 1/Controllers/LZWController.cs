@@ -49,7 +49,7 @@ namespace Lab_1.Controllers
                         Archivo.Razon = Math.Round(PesoCompreso / OriginalPeso, 3);
                         Archivo.Porcentaje = Math.Round(100.00 * (1 - Convert.ToDouble(Archivo.Razon)), 3);
 
-                        Data.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
+                        Huffman.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
 
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
