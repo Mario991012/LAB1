@@ -57,7 +57,7 @@ namespace Lab_1.Controllers
                     model = Server.MapPath($"~/Archivos Originales/{nombre[0]}.{nombre[1]}");
                     var UbicacionHuffman = Server.MapPath("~//Archivos Comprimidos");
                     file.SaveAs(model);
-                    if (Data.Instancia.CompresiónHuffman(model, nombre, UbicacionHuffman) == 1)
+                    if (Huffman.Instancia.CompresiónHuffman(model, nombre, UbicacionHuffman) == 1)
                     {
                         var RutaArchivoCompreso = Server.MapPath($"~/Archivos Comprimidos/{nombreArchivo}.huff");
 
@@ -70,7 +70,7 @@ namespace Lab_1.Controllers
                         Archivo.Razon = Math.Round(PesoCompreso / PesoOriginal,3);
                         Archivo.Porcentaje = Math.Round(100* (1 - Convert.ToDouble(Archivo.Razon)), 3);
 
-                        Data.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
+                        Huffman.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
 
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
@@ -115,7 +115,7 @@ namespace Lab_1.Controllers
                     var UbicacionDescomprimidos = Server.MapPath("~//Archivos Descomprimidos");
                     file.SaveAs(model);
 
-                    if (Data.Instancia.Descompresion(model, nombre, UbicacionDescomprimidos) == 1)
+                    if (Huffman.Instancia.Descompresion(model, nombre, UbicacionDescomprimidos) == 1)
                     {
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";

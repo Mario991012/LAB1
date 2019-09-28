@@ -5,16 +5,16 @@ using System.Text;
 using Lab_1.Models;
 namespace Lab_1.Singleton
 {
-    public class Data
+    public class Huffman
     {
-        private static Data instancia = null;
-        public static Data Instancia
+        private static Huffman instancia = null;
+        public static Huffman Instancia
         {
             get
             {
                 if (instancia == null)
                 {
-                    instancia = new Data();
+                    instancia = new Huffman();
                 }
                 return instancia;
             }

@@ -28,17 +28,17 @@ namespace Lab_1.Controllers
             var nombreDocumento = file.FileName;
             var NombreArray = nombreDocumento.Split('.');
             var OriginalPeso = Convert.ToDouble(file.ContentLength);
-            //try
-            //{
+            try
+            {
                 if (file != null && file.ContentLength > 0)
                 {
                     var model = string.Empty;
                     model = Server.MapPath($"~/Archivos Originales/{NombreArray[0]}.{NombreArray[1]}");
-                    var UbicacionAAlmacenarLZW = Server.MapPath("~//Archivos Comprimidos LZW");
+                    var UbicacionAAlmacenarLZW = Server.MapPath("~//Archivos Comprimidos");
                     file.SaveAs(model);
                     if (LogicaLZW.Comprimir(model, NombreArray, UbicacionAAlmacenarLZW) == 1)
                     {
-                        var RutaArchivoCompreso = Server.MapPath($"~/Archivos Comprimidos LZW/{NombreArray[0]}.lzw");
+                        var RutaArchivoCompreso = Server.MapPath($"~/Archivos Comprimidos/{NombreArray[0]}.lzw");
 
                         var ArchivoCompreso = new FileInfo(RutaArchivoCompreso);
                         var PesoCompreso = Convert.ToDouble(ArchivoCompreso.Length);
@@ -49,7 +49,7 @@ namespace Lab_1.Controllers
                         Archivo.Razon = Math.Round(PesoCompreso / OriginalPeso, 3);
                         Archivo.Porcentaje = Math.Round(100.00 * (1 - Convert.ToDouble(Archivo.Razon)), 3);
 
-                        Data.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
+                        Huffman.Instancia.DatosDeArchivos.Add(Archivo.NombreArchivo, Archivo);
 
                         ViewBag.Msg = "Carga del archivo correcta";
                         ViewBag.Mensaje = "Carga del archivo correcta";
@@ -67,12 +67,12 @@ namespace Lab_1.Controllers
                     ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
                     return View();
                 }
-            //}
-            //catch
-            //{
-            //    ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
-            //    return View();
-            //}
+            }
+            catch
+            {
+                ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+                return View();
+            }
         }
 
         public ActionResult CargaParaDescomprimirL()
@@ -85,11 +85,11 @@ namespace Lab_1.Controllers
         {
             var nombreArchivo = file.FileName;
             var nombre = nombreArchivo.Split('.');
-            try
-            {
+            //try
+            //{
                 if (file != null && file.ContentLength > 0)
                 {
-                    var model = Server.MapPath($"~/Archivos Comprimidos LZW/{nombreArchivo}");
+                    var model = Server.MapPath($"~/Archivos Comprimidos/{nombreArchivo}");
 
                     var UbicacionDescomprimidos = Server.MapPath("~//Archivos Descomprimidos");
                     file.SaveAs(model);
@@ -111,12 +111,12 @@ namespace Lab_1.Controllers
                     ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
                     return View();
                 }
-            }
-            catch
-            {
-                ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
-                return View();
-            }
+            //}
+            //catch
+            //{
+            //    ViewBag.Msg = "ERROR AL CARGAR EL ARCHIVO, INTENTE DE NUEVO";
+            //    return View();
+            //}
         }
 
         public ActionResult ListaArchivos()
